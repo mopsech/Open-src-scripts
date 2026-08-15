@@ -14,7 +14,9 @@ local Visuals = Window:AddTab({ Name = "Visuals", Icon = "sparkles" })
 -- ЛЕВАЯ КОЛОНКА: ESP
 local ESPSection = Visuals:AddSection({ Name = "ESP" })
 
-ESPSection:AddLabel("ESP Mode"):AddDropdown({
+-- ДРОПДАУН ЧЕРЕЗ AddLabel + AddDropdown (как в документации)
+local ESPModeLabel = ESPSection:AddLabel("ESP Mode")
+ESPModeLabel:AddDropdown({
     Default = "Box",
     Values = { "Box", "Highlight", "Box + Highlight" },
     Callback = function(v) end
