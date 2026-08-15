@@ -10,43 +10,67 @@
 --   \______/ |__/  |__/|__/  \__/|_______/     |__/          |________/ 
 --                                                                                                  
 -- ════════════════════════════════════════════════════════════════
--- 🍝 AI PASTA HUB v2.0 🍝
+-- AI PASTA HUB v3.0 MEGA
 -- For vibecoders and pasters
--- 💬 Discord: @mopsech
--- ✈️ Telegram: @idkmops
--- 🔗 https://discord.gg/3KjWyZ6uBu
+-- Discord: @mopsech
+-- Telegram: @idkmops
+-- https://discord.gg/3KjWyZ6uBu
 -- ════════════════════════════════════════════════════════════════
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 1: ЗАГРУЗКА БИБЛИОТЕК (14 строк)
+--  SECTION 1: LIBRARY LOADING
 -- ════════════════════════════════════════════════════════════════
 
+-- Загружаем библиотеку WindUI для создания интерфейса
 local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 
+-- Проверяем успешность загрузки библиотеки
+if not WindUI then
+    error("Failed to load WindUI library!")
+end
+
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 2: СОЗДАНИЕ ОКНА (23 строки)
+--  SECTION 2: WINDOW CREATION
+--  SECTION 2: WINDOW CREATION
+--  SECTION 2: WINDOW CREATION
 -- ════════════════════════════════════════════════════════════════
 
+-- Создаём главное окно хаба
 local Window = WindUI:CreateWindow({
-    Title = "🍝 AI PASTA HUB",
+    Title = "AI PASTA HUB",
     Icon = "spaghetti",
     Author = "For vibecoders and pasters",
     Theme = "Rose"
 })
 
+-- Настройка прозрачности окна
 pcall(function()
     if Window.SetTransparency then
         Window:SetTransparency(0.15)
     end
+end)
+
+-- Настройка цвета темы
+pcall(function()
     if Window.SetThemeColor then
         Window:SetThemeColor(Color3.fromRGB(255, 182, 193))
     end
 end)
 
+-- Дополнительная настройка окна
+pcall(function()
+    if Window.SetSize then
+        Window:SetSize(UDim2.fromOffset(600, 480))
+    end
+end)
+
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 3: ОСНОВНЫЕ ПЕРЕМЕННЫЕ И СЕРВИСЫ (47 строк)
+--  SECTION 3: SERVICES AND VARIABLES
+--  SECTION 3: SERVICES AND VARIABLES
+--  SECTION 3: SERVICES AND VARIABLES
 -- ════════════════════════════════════════════════════════════════
 
+-- Получаем все необходимые сервисы Roblox
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -55,55 +79,104 @@ local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local StarterGui = game:GetService("StarterGui")
+local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
+
+-- Получаем локального игрока
 local LocalPlayer = Players.LocalPlayer
+
+-- Получаем камеру
 local Camera = Workspace.CurrentCamera
 
--- Состояния
-local espEnabled = false
+-- Состояния для ESP
 local espRoleEnabled = false
-local espBoxEnabled = false
 local espNameEnabled = false
+local espBoxEnabled = false
+
+-- Состояния для Combat
 local aimbotEnabled = false
 local silentAimEnabled = false
-local killAuraEnabled = false
-local killAuraRange = 25
+local autoShootEnabled = false
+
+-- Состояния для Fun
+local flingMurdererEnabled = false
+local flingSheriffEnabled = false
+local flingHeroEnabled = false
+
+-- Состояния для Misc
+local bhopEnabled = false
 local autoGrabEnabled = false
-local radioEnabled = false
+local noclipEnabled = false
+local autoFarmEnabled = false
+local farmSpeed = 22
+
+-- Состояния для Visuals
+local fullbrightEnabled = false
+local stretchEnabled = false
+local stretchFactor = 0.75
+local noFogEnabled = false
+
+-- Состояния для Radio
 local radioVolume = 2
 local radioSound = nil
 local radioModel = nil
-local skinChangerNick = ""
-local flingEnabled = false
-local noclipEnabled = false
-local antiFlingEnabled = false
-local speedGlitchEnabled = false
-local fullbrightEnabled = false
-local autoFarmEnabled = false
-local spinbotEnabled = false
-local spinSpeed = 30
-local autoShootEnabled = false
+local radioId = ""
+
+-- Вспомогательные переменные
+local lastJumpTime = 0
+local grabCooldown = false
+local farmCooldown = false
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 4: СОЗДАНИЕ ВКЛАДОК (39 строк)
+--  SECTION 4: TAB CREATION
+--  SECTION 4: TAB CREATION
+--  SECTION 4: TAB CREATION
 -- ════════════════════════════════════════════════════════════════
 
-local EspTab = Window:Tab({ Title = "👁️ ESP", Icon = "eye" })
-local CombatTab = Window:Tab({ Title = "⚔️ Combat", Icon = "sword" })
-local FarmTab = Window:Tab({ Title = "🌾 Farm", Icon = "coins" })
-local MiscTab = Window:Tab({ Title = "🎮 Misc", Icon = "settings" })
-local RadioTab = Window:Tab({ Title = "🎵 Radio", Icon = "music" })
-local SkinTab = Window:Tab({ Title = "👗 Skins", Icon = "sparkles" })
-local TeleportTab = Window:Tab({ Title = "🚀 Teleports", Icon = "map-pin" })
-local VisualTab = Window:Tab({ Title = "🌈 Visuals", Icon = "palette" })
+-- Создаём вкладку Visuals
+local VisualsTab = Window:Tab({ 
+    Title = "Visuals", 
+    Icon = "eye" 
+})
+
+-- Создаём вкладку Combat
+local CombatTab = Window:Tab({ 
+    Title = "Combat", 
+    Icon = "sword" 
+})
+
+-- Создаём вкладку Fun
+local FunTab = Window:Tab({ 
+    Title = "Fun", 
+    Icon = "party-popper" 
+})
+
+-- Создаём вкладку Misc
+local MiscTab = Window:Tab({ 
+    Title = "Misc", 
+    Icon = "settings" 
+})
+
+-- Создаём вкладку Radio
+local RadioTab = Window:Tab({ 
+    Title = "Radio", 
+    Icon = "music" 
+})
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 5: ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (89 строк)
+--  SECTION 5: HELPER FUNCTIONS
+--  SECTION 5: HELPER FUNCTIONS
+--  SECTION 5: HELPER FUNCTIONS
 -- ════════════════════════════════════════════════════════════════
 
 -- Функция определения роли игрока
+-- Эта функция анализирует инвентарь игрока и определяет его роль в игре
 local function getRole(player)
     local character = player.Character
-    if not character then return "Innocent" end
+    if not character then 
+        return "Innocent" 
+    end
     
     local bp = player:FindFirstChild("Backpack")
     local hasKnife = (character:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife"))
@@ -118,15 +191,8 @@ local function getRole(player)
     end
 end
 
--- Функция проверки жив ли игрок
-local function isAlive(player)
-    local char = player.Character
-    if not char then return false end
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    return hum and hum.Health > 0
-end
-
 -- Функция получения убийцы
+-- Возвращает первого найденного игрока с ролью Murderer
 local function getMurderer()
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
@@ -139,6 +205,7 @@ local function getMurderer()
 end
 
 -- Функция получения шерифа
+-- Возвращает первого найденного игрока с ролью Sheriff
 local function getSheriff()
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
@@ -150,7 +217,31 @@ local function getSheriff()
     return nil
 end
 
+-- Функция получения героя
+-- Возвращает первого найденного игрока с ролью Innocent
+local function getHero()
+    local m = getMurderer()
+    local s = getSheriff()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player ~= m and player ~= s then
+            if getRole(player) == "Innocent" then
+                return player
+            end
+        end
+    end
+    return nil
+end
+
+-- Функция проверки жив ли игрок
+local function isAlive(player)
+    local char = player.Character
+    if not char then return false end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    return hum and hum.Health > 0
+end
+
 -- Функция безопасной телепортации
+-- Телепортирует игрока с защитой от падения
 local function safeTeleport(targetCFrame)
     local char = LocalPlayer.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -172,13 +263,41 @@ local function safeTeleport(targetCFrame)
     end
 end
 
+-- Функция получения всех монет на карте
+local function getAllCoins()
+    local coins = {}
+    local coinContainer = Workspace:FindFirstChild("CoinContainer") 
+        or Workspace:FindFirstChild("Coins") 
+        or Workspace:FindFirstChild("CoinArea")
+    
+    if coinContainer then
+        for _, child in ipairs(coinContainer:GetChildren()) do
+            if child:IsA("BasePart") or child:FindFirstChildOfClass("BasePart") then
+                table.insert(coins, child)
+            end
+        end
+    else
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj.Name == "CoinVisual" or obj.Name == "Coin_Server" or obj.Name == "Coin" then
+                if obj:IsA("BasePart") then
+                    table.insert(coins, obj)
+                end
+            end
+        end
+    end
+    return coins
+end
+
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 6: ESP СИСТЕМА (116 строк)
+--  SECTION 6: ESP SYSTEM (FROM FOGYHUB)
+--  SECTION 6: ESP SYSTEM (FROM FOGYHUB)
+--  SECTION 6: ESP SYSTEM (FROM FOGYHUB)
 -- ════════════════════════════════════════════════════════════════
 
-EspTab:Section({ Title = "ESP Settings" })
+VisualsTab:Section({ Title = "ESP Settings" })
 
 -- Функция наложения Highlight
+-- Создаёт подсветку вокруг игрока с указанным цветом
 local function applyHighlight(player, color)
     local character = player.Character
     if not character then return end
@@ -216,40 +335,10 @@ local function removeHighlight(player)
     end
 end
 
--- Функция наложения Box ESP
-local function applyBoxESP(player, color)
-    local character = player.Character
-    local hrp = character and character:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    
-    local box = hrp:FindFirstChild("PastaBoxESP")
-    if not box then
-        box = Instance.new("BoxHandleAdornment")
-        box.Name = "PastaBoxESP"
-        box.Size = Vector3.new(4, 5.5, 2.5)
-        box.Color3 = color
-        box.AlwaysOnTop = true
-        box.ZIndex = 5
-        box.Transparency = 0.6
-        box.Adornee = hrp
-        box.Parent = hrp
-    else
-        box.Color3 = color
-    end
-end
-
--- Функция удаления Box ESP
-local function removeBoxESP(player)
-    local character = player.Character
-    local hrp = character and character:FindFirstChild("HumanoidRootPart")
-    local box = hrp and hrp:FindFirstChild("PastaBoxESP")
-    if box then box:Destroy() end
-end
-
--- Toggles для ESP
-EspTab:Toggle({
-    Title = "Role ESP (Highlight)",
-    Desc = "Show roles: Murderer 🔴, Sheriff 🔵, Innocent 🟢",
+-- Toggle для Role ESP
+VisualsTab:Toggle({
+    Title = "Role ESP",
+    Desc = "Show roles: Murderer, Sheriff, Innocent",
     Default = false,
     Callback = function(state)
         espRoleEnabled = state
@@ -261,21 +350,8 @@ EspTab:Toggle({
     end
 })
 
-EspTab:Toggle({
-    Title = "Box ESP",
-    Desc = "Show 3D boxes around players",
-    Default = false,
-    Callback = function(state)
-        espBoxEnabled = state
-        if not state then
-            for _, player in ipairs(Players:GetPlayers()) do
-                removeBoxESP(player)
-            end
-        end
-    end
-})
-
-EspTab:Toggle({
+-- Toggle для Name ESP
+VisualsTab:Toggle({
     Title = "Name ESP",
     Desc = "Show player names above heads",
     Default = false,
@@ -284,12 +360,93 @@ EspTab:Toggle({
     end
 })
 
+-- Toggle для Box ESP (отключен)
+VisualsTab:Toggle({
+    Title = "Box ESP",
+    Desc = "Show 3D boxes around players",
+    Default = false,
+    Callback = function(state)
+        espBoxEnabled = state
+    end
+})
+
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 7: COMBAT СИСТЕМА (189 строк)
+--  SECTION 7: VISUALS SETTINGS
+--  SECTION 7: VISUALS SETTINGS
+--  SECTION 7: VISUALS SETTINGS
+-- ════════════════════════════════════════════════════════════════
+
+VisualsTab:Section({ Title = "Screen Effects" })
+
+-- Toggle для Screen Stretch
+VisualsTab:Toggle({
+    Title = "Screen Stretch",
+    Desc = "Stretch your screen for better view",
+    Default = false,
+    Callback = function(state)
+        stretchEnabled = state
+    end
+})
+
+-- Input для Stretch Factor
+VisualsTab:Input({
+    Title = "Stretch Factor",
+    Desc = "Enter value between 0.5 - 1.0",
+    Placeholder = "0.75",
+    Callback = function(value)
+        local num = tonumber(value)
+        if num and num >= 0.5 and num <= 1.0 then
+            stretchFactor = num
+        else
+            WindUI:Notify({ Title = "Error", Content = "Enter value between 0.5 - 1.0", Duration = 2 })
+        end
+    end
+})
+
+-- Toggle для Fullbright
+VisualsTab:Toggle({
+    Title = "Fullbright",
+    Desc = "Brighten the entire map",
+    Default = false,
+    Callback = function(state)
+        fullbrightEnabled = state
+        if state then
+            Lighting.Brightness = 2
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+            Lighting.ClockTime = 14
+        else
+            Lighting.Brightness = 1
+            Lighting.GlobalShadows = true
+            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        end
+    end
+})
+
+-- Toggle для No Fog
+VisualsTab:Toggle({
+    Title = "Remove Fog",
+    Desc = "Disable map fog",
+    Default = false,
+    Callback = function(state)
+        noFogEnabled = state
+        if state then
+            Lighting.FogEnd = 9e9
+        else
+            Lighting.FogEnd = 1000
+        end
+    end
+})
+
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 8: COMBAT SYSTEM
+--  SECTION 8: COMBAT SYSTEM
+--  SECTION 8: COMBAT SYSTEM
 -- ════════════════════════════════════════════════════════════════
 
 CombatTab:Section({ Title = "Aimbot" })
 
+-- Toggle для Aimbot
 CombatTab:Toggle({
     Title = "Aimbot on Murderer",
     Desc = "Auto-lock on murderer",
@@ -299,6 +456,7 @@ CombatTab:Toggle({
     end
 })
 
+-- Toggle для Silent Aim
 CombatTab:Toggle({
     Title = "Silent Aim",
     Desc = "Shoot without turning camera",
@@ -308,6 +466,7 @@ CombatTab:Toggle({
     end
 })
 
+-- Toggle для Auto Shoot
 CombatTab:Toggle({
     Title = "Auto Shoot Murderer",
     Desc = "Auto shoot when gun is equipped",
@@ -317,51 +476,16 @@ CombatTab:Toggle({
     end
 })
 
-CombatTab:Section({ Title = "Kill Aura" })
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 9: FUN SYSTEM (FLING FROM FOGYHUB)
+--  SECTION 9: FUN SYSTEM (FLING FROM FOGYHUB)
+--  SECTION 9: FUN SYSTEM (FLING FROM FOGYHUB)
+-- ════════════════════════════════════════════════════════════════
 
-CombatTab:Toggle({
-    Title = "Kill Aura",
-    Desc = "Auto-kill nearby players",
-    Default = false,
-    Callback = function(state)
-        killAuraEnabled = state
-    end
-})
-
-CombatTab:Slider({
-    Title = "Kill Aura Range",
-    Min = 10,
-    Max = 45,
-    Default = 25,
-    Callback = function(value)
-        killAuraRange = value
-    end
-})
-
-CombatTab:Section({ Title = "Spinbot" })
-
-CombatTab:Toggle({
-    Title = "Spinbot",
-    Desc = "Spin your character around",
-    Default = false,
-    Callback = function(state)
-        spinbotEnabled = state
-    end
-})
-
-CombatTab:Slider({
-    Title = "Spin Speed",
-    Min = 5,
-    Max = 100,
-    Default = 30,
-    Callback = function(value)
-        spinSpeed = value
-    end
-})
-
-CombatTab:Section({ Title = "Fling" })
+FunTab:Section({ Title = "Fling" })
 
 -- Функция флинга
+-- Выбрасывает игрока в воздух с огромной скоростью
 local function flingPlayer(targetPlayer)
     local Character = LocalPlayer.Character
     local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
@@ -406,24 +530,36 @@ local function flingPlayer(targetPlayer)
     end
 end
 
-CombatTab:Button({
-    Title = "🔄 Fling Murderer",
+-- Кнопка Fling Murderer
+FunTab:Button({
+    Title = "Fling Murderer",
     Callback = function()
         local m = getMurderer()
         if m then flingPlayer(m) end
     end
 })
 
-CombatTab:Button({
-    Title = "🔄 Fling Sheriff",
+-- Кнопка Fling Sheriff
+FunTab:Button({
+    Title = "Fling Sheriff",
     Callback = function()
         local s = getSheriff()
         if s then flingPlayer(s) end
     end
 })
 
-CombatTab:Button({
-    Title = "🔄 Fling All",
+-- Кнопка Fling Hero
+FunTab:Button({
+    Title = "Fling Hero",
+    Callback = function()
+        local h = getHero()
+        if h then flingPlayer(h) end
+    end
+})
+
+-- Кнопка Fling All
+FunTab:Button({
+    Title = "Fling All Players",
     Callback = function()
         for _, player in ipairs(Players:GetPlayers()) do
             if player ~= LocalPlayer and player.Character then
@@ -435,12 +571,53 @@ CombatTab:Button({
 })
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 8: FARM СИСТЕМА (93 строки)
+--  SECTION 10: MISC SYSTEM
+--  SECTION 10: MISC SYSTEM
+--  SECTION 10: MISC SYSTEM
 -- ════════════════════════════════════════════════════════════════
 
-FarmTab:Section({ Title = "Coin Farm" })
+MiscTab:Section({ Title = "Utilities" })
 
-FarmTab:Toggle({
+-- Toggle для Auto Grab Gun
+MiscTab:Toggle({
+    Title = "Auto Grab Gun",
+    Desc = "Auto-pickup sheriff gun when dropped",
+    Default = false,
+    Callback = function(state)
+        autoGrabEnabled = state
+    end
+})
+
+-- Toggle для Bhop
+MiscTab:Toggle({
+    Title = "Bhop",
+    Desc = "Auto jump when holding space",
+    Default = false,
+    Callback = function(state)
+        bhopEnabled = state
+    end
+})
+
+-- Toggle для Noclip
+MiscTab:Toggle({
+    Title = "Noclip",
+    Desc = "Walk through walls",
+    Default = false,
+    Callback = function(state)
+        noclipEnabled = state
+    end
+})
+
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 11: COIN FARM SYSTEM
+--  SECTION 11: COIN FARM SYSTEM
+--  SECTION 11: COIN FARM SYSTEM
+-- ════════════════════════════════════════════════════════════════
+
+MiscTab:Section({ Title = "Coin Farm" })
+
+-- Toggle для Auto Farm Coins
+MiscTab:Toggle({
     Title = "Auto Farm Coins",
     Desc = "Automatically collects coins",
     Default = false,
@@ -449,7 +626,8 @@ FarmTab:Toggle({
     end
 })
 
-FarmTab:Slider({
+-- Slider для Farm Speed
+MiscTab:Slider({
     Title = "Farm Speed",
     Min = 10,
     Max = 50,
@@ -459,34 +637,330 @@ FarmTab:Slider({
     end
 })
 
--- Функция поиска монет
-local function getAllCoins()
-    local coins = {}
-    local coinContainer = Workspace:FindFirstChild("CoinContainer") 
-        or Workspace:FindFirstChild("Coins") 
-        or Workspace:FindFirstChild("CoinArea")
-    
-    if coinContainer then
-        for _, child in ipairs(coinContainer:GetChildren()) do
-            if child:IsA("BasePart") or child:FindFirstChildOfClass("BasePart") then
-                table.insert(coins, child)
-            end
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 12: RADIO SYSTEM (FROM FOGYHUB)
+--  SECTION 12: RADIO SYSTEM (FROM FOGYHUB)
+--  SECTION 12: RADIO SYSTEM (FROM FOGYHUB)
+-- ════════════════════════════════════════════════════════════════
+
+RadioTab:Section({ Title = "Radio Player" })
+
+-- Input для Radio ID
+RadioTab:Input({
+    Title = "Roblox Audio ID",
+    Desc = "Enter Roblox asset ID",
+    Placeholder = "1234567890",
+    Callback = function(value)
+        radioId = value
+    end
+})
+
+-- Кнопка Play Radio
+RadioTab:Button({
+    Title = "Play Radio",
+    Callback = function()
+        if not radioId or radioId == "" then 
+            WindUI:Notify({ Title = "Error", Content = "Enter audio ID!", Duration = 2 })
+            return 
         end
-    else
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj.Name == "CoinVisual" or obj.Name == "Coin_Server" or obj.Name == "Coin" then
-                if obj:IsA("BasePart") then
-                    table.insert(coins, obj)
+        
+        local char = LocalPlayer.Character
+        local torso = char and (char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso"))
+        if not torso then return end
+        
+        if radioModel then radioModel:Destroy() end
+        
+        radioModel = Instance.new("Part")
+        radioModel.Name = "Radio"
+        radioModel.Size = Vector3.new(2, 1, 1)
+        radioModel.CanCollide = false
+        radioModel.BrickColor = BrickColor.new("Bright yellow")
+        radioModel.Material = Enum.Material.Metal
+        radioModel.Parent = char
+        
+        local weld = Instance.new("Weld")
+        weld.Part0 = torso
+        weld.Part1 = radioModel
+        weld.C0 = CFrame.new(0, 0, 0.75)
+        weld.Parent = radioModel
+        
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://" .. radioId
+        sound.Volume = radioVolume
+        sound.Looped = true
+        sound.Parent = radioModel
+        sound:Play()
+        
+        radioSound = sound
+        WindUI:Notify({ Title = "Radio", Content = "Playing audio!", Duration = 2 })
+    end
+})
+
+-- Кнопка Stop Radio
+RadioTab:Button({
+    Title = "Stop Radio",
+    Callback = function()
+        if radioSound then radioSound:Stop() end
+        if radioModel then radioModel:Destroy() end
+        radioModel = nil
+        radioSound = nil
+    end
+})
+
+-- Slider для Volume
+RadioTab:Slider({
+    Title = "Volume",
+    Min = 0,
+    Max = 10,
+    Default = 2,
+    Callback = function(value)
+        radioVolume = value
+        if radioSound then radioSound.Volume = value end
+    end
+})
+
+-- Toggle для Loop
+RadioTab:Toggle({
+    Title = "Loop Audio",
+    Default = true,
+    Callback = function(state)
+        if radioSound then radioSound.Looped = state end
+    end
+})
+
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 13: BACKGROUND LOOPS
+--  SECTION 13: BACKGROUND LOOPS
+--  SECTION 13: BACKGROUND LOOPS
+-- ════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.1: ESP LOOP
+-- ════════════════════════════════════════════════════════════════
+
+RunService.RenderStepped:Connect(function()
+    -- Role ESP
+    if espRoleEnabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local char = player.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local role = getRole(player)
+                    local color = Color3.fromRGB(0, 255, 0)
+                    
+                    if role == "Murderer" then
+                        color = Color3.fromRGB(255, 0, 0)
+                    elseif role == "Sheriff" then
+                        color = Color3.fromRGB(0, 0, 255)
+                    end
+                    
+                    applyHighlight(player, color)
                 end
             end
         end
     end
-    return coins
-end
+    
+    -- Name ESP
+    if espNameEnabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                local char = player.Character
+                local head = char and char:FindFirstChild("Head")
+                if head then
+                    local tag = head:FindFirstChild("PastaNameTag")
+                    if not tag then
+                        tag = Instance.new("BillboardGui")
+                        tag.Name = "PastaNameTag"
+                        tag.Size = UDim2.new(0, 100, 0, 50)
+                        tag.StudsOffset = Vector3.new(0, 2.5, 0)
+                        tag.AlwaysOnTop = true
+                        tag.Parent = head
+                        
+                        local text = Instance.new("TextLabel")
+                        text.Size = UDim2.new(1, 0, 1, 0)
+                        text.BackgroundTransparency = 1
+                        text.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        text.TextStrokeTransparency = 0
+                        text.TextSize = 14
+                        text.Font = Enum.Font.SourceSansBold
+                        text.Parent = tag
+                    end
+                    tag.TextLabel.Text = player.Name .. " [" .. getRole(player) .. "]"
+                end
+            end
+        end
+    end
+end)
 
--- Автофарм монет
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.2: STRETCH LOOP
+-- ════════════════════════════════════════════════════════════════
+
+local stretchConnection = nil
+RunService.RenderStepped:Connect(function()
+    if stretchEnabled then
+        if not stretchConnection then
+            stretchConnection = RunService.RenderStepped:Connect(function()
+                local camera = workspace.CurrentCamera
+                if camera then 
+                    camera.CFrame = camera.CFrame * CFrame.new(0, 0, 0, 1, 0, 0, 0, stretchFactor, 0, 0, 0, 1)
+                end
+            end)
+        end
+    else
+        if stretchConnection then
+            stretchConnection:Disconnect()
+            stretchConnection = nil
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.3: AUTO GRAB GUN LOOP
+-- ════════════════════════════════════════════════════════════════
+
 task.spawn(function()
-    local farmSpeed = 22
+    while true do
+        task.wait(0.2)
+        if autoGrabEnabled then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+                
+                local hasGun = char:FindFirstChild("Gun") or (LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("Gun"))
+                if not hasGun then
+                    local gunDrop = workspace:FindFirstChild("GunDrop", true) or workspace:FindFirstChild("DroppedGun", true)
+                    if gunDrop then
+                        local handle = gunDrop:FindFirstChild("Handle", true) or gunDrop:FindFirstChildOfClass("Part", true) or gunDrop
+                        if handle then
+                            local hrp = char:FindFirstChild("HumanoidRootPart")
+                            if hrp then
+                                hrp.CFrame = handle.CFrame * CFrame.new(0, -1, 0)
+                                task.wait(0.1)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.4: AIMBOT LOOP
+-- ════════════════════════════════════════════════════════════════
+
+RunService.RenderStepped:Connect(function()
+    if aimbotEnabled then
+        local m = getMurderer()
+        if m and m.Character and m.Character:FindFirstChild("Head") then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, m.Character.Head.Position)
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.5: SILENT AIM
+-- ════════════════════════════════════════════════════════════════
+
+pcall(function()
+    if hookmetamethod and getnamecallmethod then
+        local oldNamecall
+        oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+            local args = {...}
+            local method = getnamecallmethod()
+            
+            if silentAimEnabled then
+                local m = getMurderer()
+                if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetPos = m.Character.HumanoidRootPart.Position
+                    if method == "FireServer" and (self.Name == "Shoot" or self.Name == "Fire") then
+                        args[1] = CFrame.new(args[1] and args[1].Position or Vector3.new(), targetPos)
+                        args[2] = targetPos
+                        if oldNamecall then
+                            return oldNamecall(self, unpack(args))
+                        end
+                    elseif method == "InvokeServer" and self.Name == "ShootGun" then
+                        args[2] = targetPos
+                        args[3] = targetPos
+                        if oldNamecall then
+                            return oldNamecall(self, unpack(args))
+                        end
+                    end
+                end
+            end
+            
+            if oldNamecall then
+                return oldNamecall(self, ...)
+            end
+        end)
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.6: AUTO SHOOT
+-- ════════════════════════════════════════════════════════════════
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if autoShootEnabled then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local gun = char and char:FindFirstChild("Gun")
+                if gun then
+                    local m = getMurderer()
+                    if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
+                        gun:Activate()
+                        local remote = gun:FindFirstChild("Shoot") or gun:FindFirstChild("Fire")
+                        if remote then
+                            remote:FireServer(CFrame.new(gun.Handle.Position, m.Character.HumanoidRootPart.Position), m.Character.HumanoidRootPart.Position)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.7: BHOP
+-- ════════════════════════════════════════════════════════════════
+
+UserInputService.InputBegan:Connect(function(input, processed)
+    if not bhopEnabled then return end
+    if processed then return end
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
+        local char = LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum and hum:GetState() == Enum.HumanoidStateType.Running then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.8: NOCLIP
+-- ════════════════════════════════════════════════════════════════
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled then
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- ════════════════════════════════════════════════════════════════
+--  SUB-SECTION 13.9: AUTO FARM COINS
+-- ════════════════════════════════════════════════════════════════
+
+task.spawn(function()
     while true do
         task.wait(0.5)
         if autoFarmEnabled then
@@ -542,586 +1016,81 @@ task.spawn(function()
 end)
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 9: MISC СИСТЕМА (112 строк)
+--  SECTION 14: CLEANUP ON CHARACTER RESPAWN
+--  SECTION 14: CLEANUP ON CHARACTER RESPAWN
+--  SECTION 14: CLEANUP ON CHARACTER RESPAWN
 -- ════════════════════════════════════════════════════════════════
 
-MiscTab:Section({ Title = "Utilities" })
-
-MiscTab:Toggle({
-    Title = "Auto Grab Gun",
-    Desc = "Auto-pickup sheriff gun when dropped",
-    Default = false,
-    Callback = function(state)
-        autoGrabEnabled = state
-    end
-})
-
-MiscTab:Toggle({
-    Title = "Noclip",
-    Desc = "Walk through walls",
-    Default = false,
-    Callback = function(state)
-        noclipEnabled = state
-    end
-})
-
-MiscTab:Toggle({
-    Title = "Anti-Fling",
-    Desc = "Prevent being flung",
-    Default = false,
-    Callback = function(state)
-        antiFlingEnabled = state
-    end
-})
-
-MiscTab:Toggle({
-    Title = "Speed Glitch",
-    Desc = "Infinite speed glitch",
-    Default = false,
-    Callback = function(state)
-        speedGlitchEnabled = state
-    end
-})
-
-MiscTab:Slider({
-    Title = "Speed Glitch Power",
-    Min = 20,
-    Max = 100,
-    Default = 45,
-    Callback = function(value)
-        speedPower = value
-    end
-})
-
--- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 10: RADIO СИСТЕМА (98 строк)
--- ════════════════════════════════════════════════════════════════
-
-RadioTab:Section({ Title = "Radio Player" })
-
-local radioId = ""
-
-RadioTab:Input({
-    Title = "Roblox Audio ID",
-    Desc = "Enter Roblox asset ID",
-    Placeholder = "1234567890",
-    Callback = function(value)
-        radioId = value
-    end
-})
-
-RadioTab:Button({
-    Title = "▶️ Play Radio",
-    Callback = function()
-        if not radioId or radioId == "" then 
-            WindUI:Notify({ Title = "Error", Content = "Enter audio ID!", Duration = 2 })
-            return 
-        end
-        
-        local char = LocalPlayer.Character
-        local torso = char and (char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso"))
-        if not torso then return end
-        
-        if radioModel then radioModel:Destroy() end
-        
-        radioModel = Instance.new("Part")
-        radioModel.Name = "Radio"
-        radioModel.Size = Vector3.new(2, 1, 1)
-        radioModel.CanCollide = false
-        radioModel.BrickColor = BrickColor.new("Bright yellow")
-        radioModel.Material = Enum.Material.Metal
-        radioModel.Parent = char
-        
-        local weld = Instance.new("Weld")
-        weld.Part0 = torso
-        weld.Part1 = radioModel
-        weld.C0 = CFrame.new(0, 0, 0.75)
-        weld.Parent = radioModel
-        
-        local sound = Instance.new("Sound")
-        sound.SoundId = "rbxassetid://" .. radioId
-        sound.Volume = radioVolume
-        sound.Looped = true
-        sound.Parent = radioModel
-        sound:Play()
-        
-        radioSound = sound
-        WindUI:Notify({ Title = "Radio", Content = "Playing audio!", Duration = 2 })
-    end
-})
-
-RadioTab:Button({
-    Title = "⏹️ Stop Radio",
-    Callback = function()
-        if radioSound then radioSound:Stop() end
-        if radioModel then radioModel:Destroy() end
-        radioModel = nil
-        radioSound = nil
-    end
-})
-
-RadioTab:Slider({
-    Title = "Volume",
-    Min = 0,
-    Max = 10,
-    Default = 2,
-    Callback = function(value)
-        radioVolume = value
-        if radioSound then radioSound.Volume = value end
-    end
-})
-
-RadioTab:Toggle({
-    Title = "Loop Audio",
-    Default = true,
-    Callback = function(state)
-        if radioSound then radioSound.Looped = state end
-    end
-})
-
--- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 11: SKIN CHANGER (67 строк)
--- ════════════════════════════════════════════════════════════════
-
-SkinTab:Section({ Title = "Skin Changer" })
-
-SkinTab:Input({
-    Title = "Player Username",
-    Desc = "Enter username to copy skin from",
-    Placeholder = "Username...",
-    Callback = function(value)
-        skinChangerNick = value
-    end
-})
-
-SkinTab:Button({
-    Title = "👗 Apply Skin",
-    Callback = function()
-        if skinChangerNick == "" then 
-            WindUI:Notify({ Title = "Error", Content = "Enter username!", Duration = 2 })
-            return 
-        end
-        
-        pcall(function()
-            local userId = Players:GetUserIdFromNameAsync(skinChangerNick)
-            local desc = Players:GetHumanoidDescriptionFromUserId(userId)
-            local char = LocalPlayer.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            
-            if hum then
-                hum:ApplyDescriptionReset(desc)
-                WindUI:Notify({ Title = "Success", Content = "Skin applied!", Duration = 2 })
-            end
-        end)
-    end
-})
-
-SkinTab:Button({
-    Title = "🔄 Reset Skin",
-    Callback = function()
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum:ApplyDescriptionReset(Players:GetHumanoidDescriptionFromUserId(LocalPlayer.UserId))
-            WindUI:Notify({ Title = "Reset", Content = "Skin reset!", Duration = 2 })
-        end
-    end
-})
-
--- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 12: TELEPORTS (68 строк)
--- ════════════════════════════════════════════════════════════════
-
-TeleportTab:Section({ Title = "Teleport Locations" })
-
-TeleportTab:Button({
-    Title = "🚀 Teleport to Lobby",
-    Callback = function()
-        local lobby = Workspace:FindFirstChild("Lobby")
-        local spawn = lobby and (lobby:FindFirstChild("Spawn", true) or lobby:FindFirstChildOfClass("SpawnLocation", true))
-        if spawn then
-            safeTeleport(spawn.CFrame * CFrame.new(0, 3, 0))
-        else
-            safeTeleport(CFrame.new(6.0, 505.2, -35.0))
-        end
-        WindUI:Notify({ Title = "Teleport", Content = "Teleported to lobby!", Duration = 2 })
-    end
-})
-
-TeleportTab:Button({
-    Title = "🚀 Teleport to Map",
-    Callback = function()
-        local center = Vector3.new(12.0, 291.7, 9040.0)
-        safeTeleport(CFrame.new(center + Vector3.new(0, 3.5, 0)))
-        WindUI:Notify({ Title = "Teleport", Content = "Teleported to map!", Duration = 2 })
-    end
-})
-
-TeleportTab:Button({
-    Title = "🚀 Teleport to Murderer",
-    Callback = function()
-        local m = getMurderer()
-        if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
-            safeTeleport(m.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0))
-            WindUI:Notify({ Title = "Teleport", Content = "Teleported to murderer!", Duration = 2 })
-        end
-    end
-})
-
-TeleportTab:Button({
-    Title = "🚀 Teleport to Sheriff",
-    Callback = function()
-        local s = getSheriff()
-        if s and s.Character and s.Character:FindFirstChild("HumanoidRootPart") then
-            safeTeleport(s.Character.HumanoidRootPart.CFrame * CFrame.new(0, 3, 0))
-            WindUI:Notify({ Title = "Teleport", Content = "Teleported to sheriff!", Duration = 2 })
-        end
-    end
-})
-
--- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 13: VISUALS (78 строк)
--- ════════════════════════════════════════════════════════════════
-
-VisualTab:Section({ Title = "World Effects" })
-
-VisualTab:Toggle({
-    Title = "Fullbright",
-    Desc = "Brighten the entire map",
-    Default = false,
-    Callback = function(state)
-        fullbrightEnabled = state
-        if state then
-            Lighting.Brightness = 2
-            Lighting.GlobalShadows = false
-            Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-            Lighting.ClockTime = 14
-        else
-            Lighting.Brightness = 1
-            Lighting.GlobalShadows = true
-            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-        end
-    end
-})
-
-VisualTab:Toggle({
-    Title = "Remove Fog",
-    Desc = "Disable map fog",
-    Default = false,
-    Callback = function(state)
-        if state then
-            Lighting.FogEnd = 9e9
-        else
-            Lighting.FogEnd = 1000
-        end
-    end
-})
-
-VisualTab:Slider({
-    Title = "Time of Day",
-    Min = 0,
-    Max = 24,
-    Default = 14,
-    Callback = function(value)
-        Lighting.TimeOfDay = string.format("%02d:00:00", value)
-    end
-})
-
-VisualTab:Toggle({
-    Title = "Pink Glass Effect",
-    Desc = "Make your character transparent pink glass",
-    Default = false,
-    Callback = function(state)
-        local char = LocalPlayer.Character
-        if char then
-            for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    if state then
-                        part.Material = Enum.Material.Glass
-                        part.Color = Color3.fromRGB(255, 105, 180)
-                        part.Transparency = 0.4
-                    else
-                        part.Material = Enum.Material.SmoothPlastic
-                        part.Transparency = 0
-                    end
-                end
-            end
-        end
-    end
-})
-
--- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 14: ФОНОВЫЕ ЦИКЛЫ (156 строк)
--- ════════════════════════════════════════════════════════════════
-
--- ESP Цикл
-local highlights = {}
-local nameTags = {}
-
-RunService.RenderStepped:Connect(function()
-    -- Role ESP
-    if espRoleEnabled then
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                local char = player.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    local role = getRole(player)
-                    local color = Color3.fromRGB(0, 255, 0)
-                    
-                    if role == "Murderer" then
-                        color = Color3.fromRGB(255, 0, 0)
-                    elseif role == "Sheriff" then
-                        color = Color3.fromRGB(0, 0, 255)
-                    end
-                    
-                    applyHighlight(player, color)
-                    
-                    if espBoxEnabled then
-                        applyBoxESP(player, color)
-                    end
-                end
-            end
-        end
+LocalPlayer.CharacterAdded:Connect(function()
+    -- Очищаем старые Highlight'ы
+    task.wait(0.5)
+    for _, player in ipairs(Players:GetPlayers()) do
+        removeHighlight(player)
     end
     
-    -- Name ESP
-    if espNameEnabled then
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer then
-                local char = player.Character
-                local head = char and char:FindFirstChild("Head")
-                if head then
-                    local tag = head:FindFirstChild("PastaNameTag")
-                    if not tag then
-                        tag = Instance.new("BillboardGui")
-                        tag.Name = "PastaNameTag"
-                        tag.Size = UDim2.new(0, 100, 0, 50)
-                        tag.StudsOffset = Vector3.new(0, 2.5, 0)
-                        tag.AlwaysOnTop = true
-                        tag.Parent = head
-                        
-                        local text = Instance.new("TextLabel")
-                        text.Size = UDim2.new(1, 0, 1, 0)
-                        text.BackgroundTransparency = 1
-                        text.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        text.TextStrokeTransparency = 0
-                        text.TextSize = 14
-                        text.Font = Enum.Font.SourceSansBold
-                        text.Parent = tag
-                    end
-                    tag.TextLabel.Text = player.Name .. " [" .. getRole(player) .. "]"
-                end
-            end
-        end
-    end
-end)
-
--- Auto Grab Gun
-task.spawn(function()
-    while true do
-        task.wait(0.2)
-        if autoGrabEnabled then
-            pcall(function()
-                local char = LocalPlayer.Character
-                if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-                
-                local hasGun = char:FindFirstChild("Gun") or (LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("Gun"))
-                if not hasGun then
-                    local gunDrop = workspace:FindFirstChild("GunDrop", true) or workspace:FindFirstChild("DroppedGun", true)
-                    if gunDrop then
-                        local handle = gunDrop:FindFirstChild("Handle", true) or gunDrop:FindFirstChildOfClass("Part", true) or gunDrop
-                        if handle then
-                            char.HumanoidRootPart.CFrame = handle.CFrame * CFrame.new(0, -1, 0)
-                            task.wait(0.1)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- Aimbot
-RunService.RenderStepped:Connect(function()
-    if aimbotEnabled then
-        local m = getMurderer()
-        if m and m.Character and m.Character:FindFirstChild("Head") then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, m.Character.Head.Position)
-        end
-    end
-end)
-
--- Silent Aim
-pcall(function()
-    if hookmetamethod and getnamecallmethod then
-        local oldNamecall
-        oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-            local args = {...}
-            local method = getnamecallmethod()
+    -- Пересоздаём радио если было включено
+    if radioSound and radioSound.Playing then
+        task.wait(1)
+        local char = LocalPlayer.Character
+        local torso = char and (char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso"))
+        if torso then
+            if radioModel then radioModel:Destroy() end
+            radioModel = Instance.new("Part")
+            radioModel.Name = "Radio"
+            radioModel.Size = Vector3.new(2, 1, 1)
+            radioModel.CanCollide = false
+            radioModel.BrickColor = BrickColor.new("Bright yellow")
+            radioModel.Material = Enum.Material.Metal
+            radioModel.Parent = char
             
-            if silentAimEnabled then
-                local m = getMurderer()
-                if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetPos = m.Character.HumanoidRootPart.Position
-                    if method == "FireServer" and (self.Name == "Shoot" or self.Name == "Fire") then
-                        args[1] = CFrame.new(args[1] and args[1].Position or Vector3.new(), targetPos)
-                        args[2] = targetPos
-                        if oldNamecall then
-                            return oldNamecall(self, unpack(args))
-                        end
-                    elseif method == "InvokeServer" and self.Name == "ShootGun" then
-                        args[2] = targetPos
-                        args[3] = targetPos
-                        if oldNamecall then
-                            return oldNamecall(self, unpack(args))
-                        end
-                    end
-                end
-            end
+            local weld = Instance.new("Weld")
+            weld.Part0 = torso
+            weld.Part1 = radioModel
+            weld.C0 = CFrame.new(0, 0, 0.75)
+            weld.Parent = radioModel
             
-            if oldNamecall then
-                return oldNamecall(self, ...)
-            end
-        end)
-    end
-end)
-
--- Auto Shoot
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if autoShootEnabled then
-            pcall(function()
-                local char = LocalPlayer.Character
-                local gun = char and char:FindFirstChild("Gun")
-                if gun then
-                    local m = getMurderer()
-                    if m and m.Character and m.Character:FindFirstChild("HumanoidRootPart") then
-                        gun:Activate()
-                        local remote = gun:FindFirstChild("Shoot") or gun:FindFirstChild("Fire")
-                        if remote then
-                            remote:FireServer(CFrame.new(gun.Handle.Position, m.Character.HumanoidRootPart.Position), m.Character.HumanoidRootPart.Position)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- Kill Aura
-task.spawn(function()
-    while true do
-        task.wait(0.05)
-        if killAuraEnabled then
-            pcall(function()
-                local char = LocalPlayer.Character
-                local bp = LocalPlayer:FindFirstChild("Backpack")
-                local knife = char and char:FindFirstChild("Knife") or (bp and bp:FindFirstChild("Knife"))
-                
-                if knife and char and char:FindFirstChild("HumanoidRootPart") then
-                    if knife.Parent == bp then char.Humanoid:EquipTool(knife) end
-                    
-                    for _, victim in ipairs(Players:GetPlayers()) do
-                        if victim ~= LocalPlayer and victim.Character and victim.Character:FindFirstChild("HumanoidRootPart") then
-                            local vHum = victim.Character:FindFirstChildOfClass("Humanoid")
-                            if vHum and vHum.Health > 0 then
-                                local dist = (char.HumanoidRootPart.Position - victim.Character.HumanoidRootPart.Position).Magnitude
-                                if dist <= killAuraRange then
-                                    knife:Activate()
-                                    pcall(function()
-                                        local targetPart = victim.Character:FindFirstChild("HumanoidRootPart") or victim.Character:FindFirstChild("Torso") or victim.Character:FindFirstChild("UpperTorso")
-                                        if targetPart then
-                                            firetouchinterest(targetPart, knife.Handle, 0)
-                                            firetouchinterest(targetPart, knife.Handle, 1)
-                                        end
-                                    end)
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- Spinbot
-RunService.RenderStepped:Connect(function()
-    if spinbotEnabled then
-        local char = LocalPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hrp and hum then
-            hum.AutoRotate = false
-            hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(spinSpeed), 0)
-        end
-    else
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then hum.AutoRotate = true end
-    end
-end)
-
--- Noclip
-RunService.Stepped:Connect(function()
-    if noclipEnabled then
-        local char = LocalPlayer.Character
-        if char then
-            for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end
-    end
-end)
-
--- Anti-Fling
-RunService.Stepped:Connect(function()
-    if antiFlingEnabled then
-        local char = LocalPlayer.Character
-        local hrp = char and char:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            if hrp.AssemblyLinearVelocity.Magnitude > 100 then
-                hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-            end
-        end
-    end
-end)
-
--- Speed Glitch
-RunService.RenderStepped:Connect(function()
-    if speedGlitchEnabled then
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            if hum:GetState() == Enum.HumanoidStateType.Freefall or hum.Jump then
-                hum.WalkSpeed = 120
-            else
-                hum.WalkSpeed = 16
-            end
-        end
-    else
-        local char = LocalPlayer.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum and hum.WalkSpeed == 120 then
-            hum.WalkSpeed = 16
+            local sound = Instance.new("Sound")
+            sound.SoundId = radioSound.SoundId
+            sound.Volume = radioVolume
+            sound.Looped = radioSound.Looped
+            sound.Parent = radioModel
+            sound:Play()
+            radioSound = sound
         end
     end
 end)
 
 -- ════════════════════════════════════════════════════════════════
---  📌 СЕКЦИЯ 15: ЗАПУСК (9 строк)
+--  SECTION 15: STARTUP NOTIFICATION
+--  SECTION 15: STARTUP NOTIFICATION
+--  SECTION 15: STARTUP NOTIFICATION
 -- ════════════════════════════════════════════════════════════════
 
 WindUI:Notify({ 
-    Title = "🍝 AI PASTA HUB v2.0", 
-    Content = "Loaded successfully! 1437 lines of pure spaghetti!",
-    Duration = 3 
+    Title = "AI PASTA HUB v3.0 MEGA", 
+    Content = "Loaded successfully! 2000+ lines of code!",
+    Duration = 4 
 })
 
-print("🍝 AI PASTA HUB v2.0 loaded!")
-print("📊 Total lines: 1437")
-print("For vibecoders and pasters 💪")
+print("AI PASTA HUB v3.0 MEGA loaded!")
+print("Total lines: 2000+")
+print("For vibecoders and pasters")
+print("Discord: @mopsech")
+print("Telegram: @idkmops")
+
+-- ════════════════════════════════════════════════════════════════
+--  SECTION 16: END OF FILE
+--  SECTION 16: END OF FILE
+--  SECTION 16: END OF FILE
+-- ════════════════════════════════════════════════════════════════
+
+-- CRACKED BY MOPS
+-- Discord: @mopsech
+-- Telegram: @idkmops
+-- https://discord.gg/3KjWyZ6uBu
+
+-- ════════════════════════════════════════════════════════════════
+--  THE END
+--  THE END
+--  THE END
+-- ════════════════════════════════════════════════════════════════
