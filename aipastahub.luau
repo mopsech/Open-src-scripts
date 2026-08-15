@@ -36,7 +36,7 @@ do
                     u17 = true
                     v18 = loadstring(game:HttpGet('https://raw.githubusercontent.com/Footagesus/WindUI/refs/heads/main/dist/main.lua'))()
 
-                    v18:SetTheme('Rose')
+                    v18:SetTheme('Ocean')
 
                     do
                         local _ = v18
@@ -2932,7 +2932,7 @@ do
         Author = 'Mmv And Mm2',
         Folder = 'AIPASTAHUB',
         Size = UDim2.fromOffset(700, 550),
-        Theme = 'Crimson',
+        Theme = 'Ocean',
         Acrylic = false,
         HideSearchBar = false,
         OpenButton = {
