@@ -1,0 +1,450 @@
+local t1 = {}
+local v2 = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local t2 = {
+	Enabled = true,
+	FolderName = "SGXFLICK",
+	FileName = "SGXFLICKSCRIPTFORYOUYEPIEHEH"
+}
+local CreateWindow = v2.CreateWindow
+local t3 = {
+	Enabled = false,
+	Invite = "noinvitelink",
+	RememberJoins = true
+}
+local v6 = CreateWindow(v2, {
+	Name = "SyrexGenesisX - Flick",
+	LoadingTitle = "BITCH ASS CREDIT ME IF U MAKE A VID",
+	LoadingSubtitle = "Tag JoshKingGames for credit pls",
+	ConfigurationSaving = t2,
+	Discord = t3,
+	KeySystem = false
+})
+t1.value1 = game:GetService("Players")
+
+local RunService = game:GetService("RunService")
+
+game:GetService("UserInputService")
+t1.value2 = t1.value1.LocalPlayer
+local v8 = v6:CreateTab("Main", 4483362458)
+local v9 = v6:CreateTab("Visuals", 4483362458)
+
+t1.value3 = false
+t1.value4 = false
+t1.value5 = {}
+t1.value6 = 21
+t1.value7 = 6
+t1.value8 = {
+	"UpperTorso",
+	"Head",
+	"HumanoidRootPart"
+}
+t1.value9 = false
+t1.value10 = false
+t1.value11 = false
+t1.value12 = 50
+t1.value13 = nil
+t1.value14 = loadstring(game:HttpGet("https://rawscript.vercel.app/api/raw/esp_1"))()
+function t1.value15(p1, p2)
+    if not t1.value5[p1] then
+        t1.value5[p1] = {}
+    end
+
+    if not t1.value5[p1][p2.Name] then
+        local v18 = t1.value5[p1]
+        local p2Name = p2.Name
+        local CanCollide = p2.CanCollide
+        local p2Transparency = p2.Transparency
+        local p2Size = p2.Size
+
+        v18[p2Name] = {
+			CanCollide = CanCollide,
+			Transparency = p2Transparency,
+			Size = p2Size
+		}
+    end
+end
+function t1.value16(p3)
+    if t1.value5[p3] then
+        for k, v in pairs(t1.value5[p3]) do
+            local v33 = p3.Character and p3.Character:FindFirstChild(k)
+            local v34 = v33
+
+            if v33 then
+                v34 = v33:IsA("BasePart")
+            end
+
+            if v34 then
+                v33.CanCollide = v.CanCollide
+                v33.Transparency = v.Transparency
+                v33.Size = v.Size
+            end
+        end
+    end
+end
+t1.value17 = nil
+function t1.value17(p4)
+    for _, v in ipairs(t1.value8) do
+        local v38 = p4.Character and p4.Character:FindFirstChild(v)
+
+        if v38 and v38:IsA("BasePart") then
+            t1.value15(p4, v38)
+            v38.CanCollide = not t1.value4
+            v38.Transparency = t1.value7 / 10
+            v38.Size = Vector3.new(t1.value6, t1.value6, t1.value6)
+        end
+    end
+end
+t1.value18 = nil
+function t1.value18()
+    for _, player in ipairs(t1.value1:GetPlayers()) do
+        local v41 = player ~= t1.value2
+
+        if v41 then
+            v41 = player.Character
+
+            if v41 then
+                v41 = player.Character:FindFirstChild("HumanoidRootPart")
+            end
+        end
+
+        if v41 then
+            t1.value17(player)
+        end
+    end
+end
+t1.value19 = nil
+function t1.value19(_)
+    task.wait(0.1)
+
+    if t1.value3 then
+        t1.value18()
+    end
+end
+function t1.value20(p6)
+    p6.CharacterAdded:Connect(t1.value19)
+    p6.CharacterRemoving:Connect(function()
+        t1.value16(p6)
+
+        local v81 = p6
+
+        t1.value5[v81] = nil
+    end)
+end
+function t1.value21(p7, p8)
+    if not t1.value10 or not p8 then
+        return true
+    end
+
+    local CFramePosition = workspace.CurrentCamera.CFrame.Position
+    local Unit = (p7 - CFramePosition).Unit
+    local Magnitude = (p7 - CFramePosition).Magnitude
+    local raycastParams = RaycastParams.new()
+
+    raycastParams.FilterDescendantsInstances = {
+		t1.value2.Character,
+		p8
+	}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.IgnoreWater = true
+
+    local raycastResult = workspace:Raycast(CFramePosition, Unit * Magnitude, raycastParams)
+
+    if raycastResult and not raycastResult.Instance:IsDescendantOf(p8) then
+        return false
+    end
+
+    return true
+end
+function t1.value22(p9)
+    if not t1.value11 then
+        return true
+    end
+
+    local ViewportSize = workspace.CurrentCamera.ViewportSize
+    local vector2 = Vector2.new(ViewportSize.X / 2, ViewportSize.Y / 2)
+    local v45, v46 = workspace.CurrentCamera:WorldToViewportPoint(p9)
+
+    if not v46 then
+        return false
+    end
+
+    return (Vector2.new(v45.X, v45.Y) - vector2).Magnitude <= t1.value12
+end
+local function v10()
+    local v53
+    local n1 = 1e999
+    for _, player in ipairs(t1.value1:GetPlayers()) do
+        if player ~= t1.value2 and player.Character then
+            local Humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            local Head = player.Character:FindFirstChild("Head")
+
+            if Humanoid and (Humanoid.Health > 0 and Head) then
+                local Magnitude = (Head.Position - t1.value2.Character.Head.Position).Magnitude
+                local v60 = Magnitude < n1
+
+                if v60 then
+                    v60 = t1.value21(Head.Position, player.Character)
+
+                    if v60 then
+                        v60 = t1.value22(Head.Position)
+                    end
+                end
+
+                if v60 then
+                    v53 = player
+                    n1 = Magnitude
+                end
+            end
+        end
+    end
+
+    return v53
+end
+function t1.value23(p10)
+    if not p10 or not p10.Character then
+        return
+    end
+
+    local Head = p10.Character:FindFirstChild("Head")
+
+    if not Head then
+        return
+    end
+
+    local CurrentCamera = workspace.CurrentCamera
+
+    CurrentCamera.CFrame = CFrame.new(CurrentCamera.CFrame.Position, Head.Position)
+end
+function t1.value24()
+    if t1.value13 then
+        t1.value13:Destroy()
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+
+    ScreenGui.Name = "FOVCircle"
+    ScreenGui.Parent = game:GetService("CoreGui")
+    ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    t1.value13 = Instance.new("Frame")
+    t1.value13.Name = "FOVCircle"
+    t1.value13.AnchorPoint = Vector2.new(0.5, 0.5)
+    t1.value13.Size = UDim2.new(0, t1.value12 * 2, 0, t1.value12 * 2)
+    t1.value13.Position = UDim2.new(0.5, 0, 0.5, 0)
+    t1.value13.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    t1.value13.BackgroundTransparency = 0.85
+    t1.value13.BorderSizePixel = 0
+    t1.value13.Visible = t1.value11
+    t1.value13.Parent = ScreenGui
+
+    local UICorner = Instance.new("UICorner")
+
+    UICorner.CornerRadius = UDim.new(1, 0)
+    UICorner.Parent = t1.value13
+
+    local UIStroke = Instance.new("UIStroke")
+
+    UIStroke.Color = Color3.fromRGB(255, 0, 0)
+    UIStroke.Thickness = 2
+    UIStroke.Transparency = 0.3
+    UIStroke.Parent = t1.value13
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if t1.value13 then
+            t1.value13.Position = UDim2.new(0.5, 0, 0.5, 0)
+        end
+    end)
+end
+function t1.value25()
+    if t1.value13 then
+        t1.value13.Size = UDim2.new(0, t1.value12 * 2, 0, t1.value12 * 2)
+        t1.value13.Position = UDim2.new(0.5, 0, 0.5, 0)
+        t1.value13.Visible = t1.value11
+    end
+end
+RunService.RenderStepped:Connect(function()
+    if t1.value9 then
+        local v64 = v10()
+
+        if v64 then
+            t1.value23(v64)
+        end
+    end
+end)
+v8:CreateSection("Hitbox")
+v8:CreateToggle({
+	Name = "Enable Hitbox",
+	CurrentValue = false,
+	Flag = "HitboxToggle",
+	Callback = function(p11)
+    t1.value3 = p11
+
+    if not p11 then
+        for _, player in ipairs(t1.value1:GetPlayers()) do
+            t1.value16(player)
+        end
+
+        return
+    end
+
+    t1.value18()
+end
+})
+v8:CreateSlider({
+	Name = "Hitbox Size",
+	Range = {
+		1,
+		50
+	},
+	Increment = 1,
+	Suffix = "studs",
+	CurrentValue = 21,
+	Flag = "HitboxSize",
+	Callback = function(p12)
+    t1.value6 = p12
+
+    if t1.value3 then
+        t1.value18()
+    end
+end
+})
+v8:CreateSlider({
+	Name = "Hitbox Transparency",
+	Range = {
+		1,
+		10
+	},
+	Increment = 1,
+	Suffix = "/10",
+	CurrentValue = 6,
+	Flag = "HitboxTransparency",
+	Callback = function(p13)
+    t1.value7 = p13
+
+    if t1.value3 then
+        t1.value18()
+    end
+end
+})
+v8:CreateToggle({
+	Name = "No Collision",
+	CurrentValue = false,
+	Flag = "NoCollision",
+	Callback = function(p14)
+    t1.value4 = p14
+
+    if t1.value3 then
+        t1.value18()
+    end
+end
+})
+v8:CreateSection("Aimbot")
+v8:CreateToggle({
+	Name = "Enable Aimbot",
+	CurrentValue = false,
+	Flag = "AimbotToggle",
+	Callback = function(p15)
+    t1.value9 = p15
+end
+})
+v8:CreateToggle({
+	Name = "Wall Check",
+	CurrentValue = false,
+	Flag = "WallCheckToggle",
+	Callback = function(p16)
+    t1.value10 = p16
+end
+})
+v8:CreateToggle({
+	Name = "Show FOV Circle",
+	CurrentValue = false,
+	Flag = "FOVToggle",
+	Callback = function(p17)
+    t1.value11 = p17
+
+    if p17 then
+        p17 = not t1.value13
+    end
+
+    if p17 then
+        t1.value24()
+    end
+
+    t1.value25()
+end
+})
+v8:CreateSlider({
+	Name = "FOV Size",
+	Range = {
+		10,
+		500
+	},
+	Increment = 10,
+	Suffix = "pixels",
+	CurrentValue = 50,
+	Flag = "FOVSize",
+	Callback = function(p18)
+    t1.value12 = p18
+    t1.value25()
+end
+})
+v9:CreateSection("ESP")
+v9:CreateToggle({
+	Name = "Enable Esp",
+	CurrentValue = false,
+	Flag = "ESPToggle",
+	Callback = function(p19)
+    t1.value14:Toggle(p19)
+    t1.value14.Players = p19
+    t1.value14.TeamMates = true
+end
+})
+v9:CreateToggle({
+	Name = "Tracers Esp",
+	CurrentValue = false,
+	Flag = "TracersToggle",
+	Callback = function(p20)
+    t1.value14.Tracers = p20
+end
+})
+v9:CreateToggle({
+	Name = "Name Esp",
+	CurrentValue = false,
+	Flag = "NameToggle",
+	Callback = function(p21)
+    t1.value14.Names = p21
+end
+})
+v9:CreateToggle({
+	Name = "Boxes Esp",
+	CurrentValue = false,
+	Flag = "BoxesToggle",
+	Callback = function(p22)
+    t1.value14.Boxes = p22
+end
+})
+v9:CreateToggle({
+	Name = "TeamColor",
+	CurrentValue = false,
+	Flag = "TeamColorToggle",
+	Callback = function(p23)
+    t1.value14.TeamColor = p23
+end
+})
+for _, player in ipairs(t1.value1:GetPlayers()) do
+    t1.value20(player)
+end
+t1.value1.PlayerAdded:Connect(function(player)
+    t1.value20(player)
+end)
+t1.value14.TeamMates = true
+if t1.value11 then
+    t1.value24()
+end
+v2:Notify({
+	Title = "SGX IS READY TO BE USED",
+	Content = "Script loaded successfully!",
+	Duration = 6.5,
+	Image = 4483362458
+})
+v2:LoadConfiguration()
