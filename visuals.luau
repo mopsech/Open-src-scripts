@@ -1,14 +1,21 @@
--- ===================== WIND UI / SKY THEME =====================
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/UI-Libs/main/WindUI.lua"))()
-local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua"))()
+local Fatality = loadstring(game:HttpGet("https://raw.githubusercontent.com/4lpaca-pin/Fatality/refs/heads/main/src/source.luau"))();
+local Notification = Fatality:CreateNotifier();
 
-local Window = Library:CreateWindow({
-    Title = "CandyZone",
-    Icon = "rbxassetid://95816097006870",
-    Theme = "Sky",
-    Size = UDim2.fromOffset(600, 500)
+Fatality:Loader({
+    Name = "Candy Visuals",
+    Duration = 4
+});
+
+Notification:Notify({
+    Title = "Candy Visuals",
+    Content = "Hello, "..game.Players.LocalPlayer.DisplayName..' Welcome back!',
+    Icon = "clipboard"
 })
+
+local Window = Fatality.new({
+    Name = "Candy Visuals",
+    Expire = "never",
+});
 
 -- ===================== SERVICES =====================
 local player = game.Players.LocalPlayer
@@ -17,6 +24,7 @@ local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local MaterialService = game:GetService("MaterialService")
 local ContentProvider = game:GetService("ContentProvider")
+local TweenService = game:GetService("TweenService")
 
 -- ===================== DEFAULT SETTINGS =====================
 local defaultLighting = {
@@ -347,6 +355,8 @@ local FPSVariables = {
 }
 
 local LarpticAtmosphere = nil
+local auraRainbowConnection = nil
+local auraPulseConnection = nil
 
 -- ===================== ФУНКЦИИ КИТАЙСКОЙ ШЛЯПЫ =====================
 local function Hat_RemoveClassic()
@@ -688,8 +698,7 @@ local function ForceField_Update()
                 end
             end
         end
-    end
-end
+    endend
 
 local function ForceField_Remove(char)
     if ForceFieldVariables.originalColors[char] then
@@ -929,7 +938,7 @@ local function applyParticleAuraToCharacter(character, auraName, color)
             for _, child in ipairs(part:GetChildren()) do
                 pcall(function()
                     local inst = child:Clone()
-                    inst.Name = "LarpticAuraParticle"
+                    inst.Name = "CandyParticleAura"
                     inst.Parent = targetPart
                     if color then
                         tintParticleSubtree(inst, color)
@@ -1002,7 +1011,7 @@ local function applyAtmosphere()
     local atm = LarpticAtmosphere
     if not (atm and atm.Parent) then
         atm = Instance.new('Atmosphere')
-        atm.Name = 'LarpticAtmosphere'
+        atm.Name = 'CandyAtmosphere'
         atm.Parent = Lighting
         LarpticAtmosphere = atm
     end
@@ -1055,7 +1064,7 @@ end
 
 local function shouldSkipTexturePart(part)
     if not part:IsDescendantOf(workspace) then return true end
-    if part.Name == 'LarpticWeather' or part.Name == 'Part' then return true end
+    if part.Name == 'CandyWeather' or part.Name == 'Part' then return true end
     local parent = part.Parent
     if parent and (parent:IsA('Tool') or parent:IsA('Accessory')) then return true end
     local model = part:FindFirstAncestorOfClass('Model')
@@ -1178,7 +1187,7 @@ end
 local function Screen_Toggle(value)
     WorldVariables.screenEnabled = value
     if value then
-        getgenv().gg_scripters = "Aori0001"
+        getgenv().gg_scripters = "CandyVisuals"
         WorldVariables.screenConnection = RunService.RenderStepped:Connect(function()
             camera.CFrame = camera.CFrame * CFrame.new(0, 0, 0, 1, 0, 0, 0, (0.65 + WorldVariables.screenIntensity), 0, 0, 0, 1)
         end)
@@ -1214,337 +1223,901 @@ local function Anime_Toggle(value)
     end
 end
 
--- ===================== СОЗДАНИЕ ВКЛАДОК =====================
-local MainTab = Window:AddTab("Main")
-local VisualTab = Window:AddTab("Visual")
-local WorldTab = Window:AddTab("World")
-local SettingsTab = Window:AddTab("Settings")
+-- ===================== СОЗДАНИЕ ВКЛАДКИ VISUALS =====================
+local Visuals = Window:AddMenu({
+    Name = "Visuals",
+    Icon = "eye"
+})
 
--- ===================== MAIN TAB =====================
-local MainGroup = MainTab:AddGroup("Information")
-MainGroup:AddLabel("by https://discord.gg/3KjWyZ6uBu")
-MainGroup:AddLabel("All the functions are visual; no one can see them except you.")
-MainGroup:AddLabel("Script Open Source")
+-- ===================== ПОДКАТЕГОРИЯ WORLD =====================
+local World = Visuals:AddSection({
+    Name = "World",
+    Position = 'left'
+})
 
--- ===================== VISUAL TAB =====================
-
--- КИТАЙСКАЯ ШЛЯПА
-local HatGroup = VisualTab:AddGroup("Китайская Шляпа")
-
-local HatToggle = HatGroup:AddToggle("Enable Hat", false, function(Value)
-    Hat_ToggleEnabled(Value)
-end)
-
-local HatStyle = HatGroup:AddDropdown("Hat Style", {"Classic", "Drawing"}, "Classic", function(Value)
-    Hat_ChangeStyle(Value)
-end)
-
-local HatRainbow = HatGroup:AddToggle("Rainbow Mode", false, function(Value)
-    HatVariables.rainbow = Value
-end)
-
-local HatRainbowSpeed = HatGroup:AddSlider("Rainbow Speed", 5, 1, 20, 0, function(Value)
-    HatVariables.rainbowSpeed = Value
-end)
-
-local HatTransparency = HatGroup:AddSlider("Transparency", 0.3, 0, 1, 2, function(Value)
-    HatVariables.transparency = Value
-end)
-
-local HatRadius = HatGroup:AddSlider("Radius", 2.4, 0.5, 10, 1, function(Value)
-    HatVariables.radius = Value
-end)
-
-local HatHeight = HatGroup:AddSlider("Height", 1.6, 0.5, 5, 1, function(Value)
-    HatVariables.height = Value
-end)
-
-local HatReflectance = HatGroup:AddSlider("Reflectance (Classic Only)", 0, 0, 1, 2, function(Value)
-    HatVariables.reflectance = Value
-end)
-
-local HatSides = HatGroup:AddSlider("Sides (Drawing Only)", 25, 3, 300, 0, function(Value)
-    Hat_UpdateSides(Value)
-end)
-
-local HatColor = HatGroup:AddColorPicker("Hat Color", Color3.fromRGB(0, 255, 255), function(Value)
-    HatVariables.color = Value
-end)
-
--- TRAIL
-local TrailGroup = VisualTab:AddGroup("Trail")
-
-local TrailToggle = TrailGroup:AddToggle("Enable Trail", false, function(Value)
-    Trail_ToggleEnabled(Value)
-end)
-
-local TrailGradient = TrailGroup:AddToggle("Gradient Mode", false, function(Value)
-    TrailVariables.isGradient = Value
-    if TrailVariables.enabled and player.Character then 
-        Trail_AddToCharacter(player.Character) 
+World:AddToggle({
+    Name = "Full Bright",
+    Callback = function(Value)
+        WorldVariables.fullBrightEnabled = Value
+        if not Value then
+            Lighting.Brightness = defaultLighting.Brightness
+            Lighting.GlobalShadows = defaultLighting.GlobalShadows
+            Lighting.OutdoorAmbient = defaultLighting.OutdoorAmbient
+        end
     end
-end)
+})
 
-local TrailLifetime = TrailGroup:AddSlider("Lifetime", 0.5, 0.1, 3, 1, function(Value)
-    TrailVariables.lifetime = Value
-    Trail_UpdateAll()
-end)
-
-local TrailTransparency = TrailGroup:AddSlider("Start Transparency", 0, 0, 1, 2, function(Value)
-    TrailVariables.transparencyStart = Value
-    Trail_UpdateAll()
-end)
-
-local TrailRainbow = TrailGroup:AddToggle("Rainbow (Static)", false, function(Value)
-    TrailVariables.rainbow = Value
-    Trail_UpdateAll()
-end)
-
-local TrailColor = TrailGroup:AddColorPicker("Static Color", Color3.fromRGB(0, 255, 255), function(Value)
-    TrailVariables.colorStatic = Value
-    Trail_UpdateAll()
-end)
-
-local TrailGradient1 = TrailGroup:AddColorPicker("Gradient 1", Color3.fromRGB(0, 86, 255), function(Value)
-    TrailVariables.gradient1 = Value
-    Trail_UpdateAll()
-end)
-
-local TrailGradient2 = TrailGroup:AddColorPicker("Gradient 2", Color3.fromRGB(255, 0, 0), function(Value)
-    TrailVariables.gradient2 = Value
-    Trail_UpdateAll()
-end)
-
--- FORCEFIELD
-local FFGroup = VisualTab:AddGroup("ForceField")
-
-local FFToggle = FFGroup:AddToggle("Enable ForceField", false, function(Value)
-    ForceField_ToggleEnabled(Value)
-end)
-
-local FFRainbow = FFGroup:AddToggle("Rainbow Mode", false, function(Value)
-    ForceFieldVariables.rainbow = Value
-    ForceField_Update()
-end)
-
-local FFColor = FFGroup:AddColorPicker("Color", Color3.fromRGB(128, 128, 128), function(Value)
-    ForceFieldVariables.color = Value
-    if ForceFieldVariables.enabled and not ForceFieldVariables.rainbow and player.Character then 
-        ForceField_Apply(player.Character) 
+World:AddToggle({
+    Name = "Time Changer",
+    Callback = function(Value)
+        WorldVariables.timeEnabled = Value
     end
-end)
+})
 
--- AURA TRAILER
-local AuraTrailerGroup = VisualTab:AddGroup("Aura Trailer")
-
-local AuraTrailerToggle = AuraTrailerGroup:AddToggle("Enable Aura Trailer", false, function(Value)
-    AuraTrailerVariables.enabled = Value
-    AuraTrailer_Toggle(Value)
-end)
-
-local AuraTrailerColor = AuraTrailerGroup:AddColorPicker("Color", Color3.fromRGB(255, 0, 0), function(Value)
-    AuraTrailerVariables.color = Value
-    if AuraTrailerVariables.enabled then AuraTrailer_Update() end
-end)
-
-local AuraTrailerLife = AuraTrailerGroup:AddSlider("Lifetime", 0.5, 0.1, 3, 1, function(Value)
-    AuraTrailerVariables.lifetime = Value
-    if AuraTrailerVariables.enabled then AuraTrailer_Update() end
-end)
-
--- CLASSIC AURA
-local ClassicAuraGroup = VisualTab:AddGroup("Classic Aura")
-
-local ClassicAuraEnabled = ClassicAuraGroup:AddToggle("Enable Classic Aura", false, function(Value)
-    ClassicAura_RefreshAll()
-end)
-
-local ClassicAuraDropdown = ClassicAuraGroup:AddDropdown("Select Auras", AuraModels, {}, true, function(Value)
-    ClassicAura_RefreshAll()
-end)
-
--- PARTICLE AURA
-local ParticleAuraGroup = VisualTab:AddGroup("Particle Aura")
-
-local ParticleAuraEnabled = ParticleAuraGroup:AddToggle("Enable Particle Aura", false, function(Value)
-    ParticleAura_RefreshAll()
-end)
-
-local ParticleAuraColor = ParticleAuraGroup:AddColorPicker("Aura Color", Color3.fromRGB(133, 220, 255), function()
-    ParticleAura_RefreshAll()
-end)
-
-local ParticleAuraDropdown = ParticleAuraGroup:AddDropdown("Select Auras", PARTICLE_AURA_NAMES, {}, true, function(Value)
-    ParticleAura_RefreshAll()
-end)
-
--- SCREEN EFFECT
-local ScreenGroup = VisualTab:AddGroup("Screen Effect")
-
-local ScreenToggle = ScreenGroup:AddToggle("Enable Screen Effect", false, function(Value)
-    Screen_Toggle(Value)
-end)
-
-local ScreenIntensity = ScreenGroup:AddSlider("Screen Stretch", 0, 0, 0.2, 3, function(Value)
-    WorldVariables.screenIntensity = Value
-end)
-
--- UTILITIES
-local UtilitiesGroup = VisualTab:AddGroup("Utilities")
-
-local AnimeToggle = UtilitiesGroup:AddToggle("Anime Image", false, function(Value)
-    Anime_Toggle(Value)
-end)
-
-UtilitiesGroup:AddButton("FPS/Ping Counter 1", function()
-    if not FPSVariables.fpsPing1Enabled then
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/GLAMOHGA/fling/refs/heads/main/хз%20как%20назвать%20типо%20фпс%20и%20пинг.md"))()
-        FPSVariables.fpsPing1Enabled = true
+World:AddSlider({
+    Name = "Time of Day",
+    Default = 12,
+    Min = 0,
+    Max = 24,
+    Round = 1,
+    Callback = function(Value)
+        WorldVariables.timeValue = Value
     end
-end)
+})
 
-UtilitiesGroup:AddButton("FPS/Ping Counter 2", function()
-    if not FPSVariables.fpsPing2Enabled then
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/VetrexTheBest/Fps-ping/refs/heads/main/fps%2Bping.txt"))()
-        FPSVariables.fpsPing2Enabled = true
+World:AddToggle({
+    Name = "Disable Fog",
+    Callback = function(Value)
+        if Value then
+            Lighting.FogEnd = 100000
+            Lighting.FogStart = 100000
+        else
+            Lighting.FogEnd = defaultLighting.FogEnd
+            Lighting.FogStart = defaultLighting.FogStart
+        end
     end
-end)
+})
 
--- ===================== WORLD TAB =====================
+World:AddColorPicker({
+    Name = "Fog Color",
+    Default = Color3.fromRGB(127, 127, 127),
+    Callback = function(Value)
+        Lighting.FogColor = Value
+    end
+})
+
+World:AddColorPicker({
+    Name = "Ambient Color",
+    Default = Color3.fromRGB(127, 127, 127),
+    Callback = function(Value)
+        Lighting.Ambient = Value
+    end
+})
+
+World:AddColorPicker({
+    Name = "Outdoor Ambient",
+    Default = Color3.fromRGB(127, 127, 127),
+    Callback = function(Value)
+        Lighting.OutdoorAmbient = Value
+    end
+})
 
 -- SKYBOX
-local SkyboxGroup = WorldTab:AddGroup("Skybox")
+World:AddDivider()
 
 local skyboxList = {}
 for k in pairs(SkyboxAssets) do table.insert(skyboxList, k) end
 table.sort(skyboxList)
 
-local SkyboxDropdown = SkyboxGroup:AddDropdown("Select Skybox", skyboxList, "HD", function(Value)
-    SkyboxVariables.current = Value
-    if not SkyboxVariables.customEnabled then
-        SkyboxVariables.customEnabled = true
-        SkyboxToggle:SetValue(true)
+World:AddDropdown({
+    Name = "Skybox",
+    Values = skyboxList,
+    Default = "HD",
+    Callback = function(Value)
+        SkyboxVariables.current = Value
+        if not SkyboxVariables.customEnabled then
+            SkyboxVariables.customEnabled = true
+            SkyboxToggle:SetValue(true)
+        end
+        Skybox_Apply(SkyboxVariables.current)
     end
-    Skybox_Apply(SkyboxVariables.current)
-end)
+})
 
-local SkyboxToggle = SkyboxGroup:AddToggle("Enable Skybox", false, function(Value)
-    SkyboxVariables.customEnabled = Value
-    if Value then 
-        Skybox_Apply(SkyboxVariables.current) 
-    else 
-        Skybox_RestoreDefault() 
-    end
-end)
-
--- LIGHTING
-local LightingGroup = WorldTab:AddGroup("Lighting")
-
-local TimeToggle = LightingGroup:AddToggle("Enable Time Changer", false, function(Value)
-    WorldVariables.timeEnabled = Value
-end)
-
-local TimeSlider = LightingGroup:AddSlider("Time (0-24 hours)", 12, 0, 24, 1, function(Value)
-    WorldVariables.timeValue = Value
-end)
-
-local FullBrightToggle = LightingGroup:AddToggle("Full Bright", false, function(Value)
-    WorldVariables.fullBrightEnabled = Value
-    if not Value then
-        Lighting.Brightness = defaultLighting.Brightness
-        Lighting.GlobalShadows = defaultLighting.GlobalShadows
-        Lighting.OutdoorAmbient = defaultLighting.OutdoorAmbient
-    end
-end)
-
--- ATMOSPHERE
-local WorldAtmGroup = WorldTab:AddGroup("Atmosphere")
-
-local WorldAtmEnabled = WorldAtmGroup:AddToggle("Atmosphere", false, function(Value)
-    if Value then
-        applyAtmosphere()
-    else
-        if LarpticAtmosphere then
-            pcall(function() LarpticAtmosphere:Destroy() end)
-            LarpticAtmosphere = nil
+local SkyboxToggle = World:AddToggle({
+    Name = "Enable Skybox",
+    Callback = function(Value)
+        SkyboxVariables.customEnabled = Value
+        if Value then 
+            Skybox_Apply(SkyboxVariables.current) 
+        else 
+            Skybox_RestoreDefault() 
         end
     end
-end)
+})
 
-local WorldAtmColor = WorldAtmGroup:AddColorPicker("Atmosphere Color", Color3.fromRGB(199, 212, 255), function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
-    end
-end)
+-- ATMOSPHERE
+World:AddDivider()
 
-local WorldAtmDecay = WorldAtmGroup:AddColorPicker("Atmosphere Decay", Color3.fromRGB(106, 112, 125), function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
+local WorldAtmEnabled = World:AddToggle({
+    Name = "Atmosphere",
+    Option = true,
+    Callback = function(Value)
+        if Value then
+            applyAtmosphere()
+        else
+            if LarpticAtmosphere then
+                pcall(function() LarpticAtmosphere:Destroy() end)
+                LarpticAtmosphere = nil
+            end
+        end
     end
-end)
+})
 
-local WorldAtmHaze = WorldAtmGroup:AddSlider("Haze", 1, 0, 10, 1, function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
+WorldAtmEnabled.Option:AddColorPicker({
+    Name = "Atmosphere Color",
+    Default = Color3.fromRGB(199, 212, 255),
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
     end
-end)
+})
 
-local WorldAtmGlare = WorldAtmGroup:AddSlider("Glare", 10, 0, 10, 1, function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
+WorldAtmEnabled.Option:AddColorPicker({
+    Name = "Atmosphere Decay",
+    Default = Color3.fromRGB(106, 112, 125),
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
     end
-end)
+})
 
-local WorldAtmOffset = WorldAtmGroup:AddSlider("Offset", 0, 0, 1, 2, function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
+World:AddSlider({
+    Name = "Atmosphere Haze",
+    Default = 1,
+    Min = 0,
+    Max = 10,
+    Round = 1,
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
     end
-end)
+})
 
-local WorldAtmDensity = WorldAtmGroup:AddSlider("Density", 0.35, 0, 1, 2, function()
-    if WorldAtmEnabled.Value then
-        applyAtmosphere()
+World:AddSlider({
+    Name = "Atmosphere Glare",
+    Default = 10,
+    Min = 0,
+    Max = 10,
+    Round = 1,
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
     end
-end)
+})
+
+World:AddSlider({
+    Name = "Atmosphere Offset",
+    Default = 0,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
+    end
+})
+
+World:AddSlider({
+    Name = "Atmosphere Density",
+    Default = 0.35,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function()
+        if WorldAtmEnabled.Value then
+            applyAtmosphere()
+        end
+    end
+})
 
 -- TEXTURE PACK
-local TextureGroup = WorldTab:AddGroup("Texture Pack")
+World:AddDivider()
 
-local WorldTexturesEnabled = TextureGroup:AddToggle("Minecraft Textures", false, function(Value)
-    if Value then
-        applyTexturePack()
-    else
-        clearTexturePack()
+World:AddToggle({
+    Name = "Minecraft Textures",
+    Callback = function(Value)
+        if Value then
+            applyTexturePack()
+        else
+            clearTexturePack()
+        end
     end
-end)
+})
 
 -- NEBULA
-local NebulaGroup = WorldTab:AddGroup("Nebula Theme")
+World:AddDivider()
 
-local NebulaToggle = NebulaGroup:AddToggle("Enable Nebula", false, function(Value)
-    NebulaVariables.enabled = Value
-    if Value then
-        Nebula_Enable()
-    else
-        Nebula_Disable()
+World:AddToggle({
+    Name = "Nebula Theme",
+    Callback = function(Value)
+        NebulaVariables.enabled = Value
+        if Value then
+            Nebula_Enable()
+        else
+            Nebula_Disable()
+        end
     end
-end)
+})
 
-local NebulaColor = NebulaGroup:AddColorPicker("Theme Color", Color3.fromRGB(173, 216, 230), function(Value)
-    NebulaVariables.themeColor = Value
-    Nebula_UpdateColor()
-end)
+World:AddColorPicker({
+    Name = "Nebula Color",
+    Default = Color3.fromRGB(173, 216, 230),
+    Callback = function(Value)
+        NebulaVariables.themeColor = Value
+        Nebula_UpdateColor()
+    end
+})
 
--- ===================== SETTINGS TAB =====================
-local SettingsGroup = SettingsTab:AddGroup("Menu Settings")
+-- SCREEN EFFECT
+World:AddDivider()
 
-local KeybindToggle = SettingsGroup:AddToggle("Open Keybind Menu", false, function(Value)
-    -- В Wind UI нет стандартного KeybindFrame, оставляем для совместимости
-end)
+World:AddToggle({
+    Name = "Screen Effect",
+    Callback = function(Value)
+        Screen_Toggle(Value)
+    end
+})
 
-local UnloadButton = SettingsGroup:AddButton("Unload Script", function()
-    Window:Destroy()
-end)
+World:AddSlider({
+    Name = "Screen Stretch",
+    Default = 0,
+    Min = 0,
+    Max = 0.2,
+    Round = 3,
+    Callback = function(Value)
+        WorldVariables.screenIntensity = Value
+    end
+})
+
+-- ===================== ПОДКАТЕГОРИЯ PLAYER =====================
+local Player = Visuals:AddSection({
+    Name = "Player",
+    Position = 'center'
+})
+
+-- КИТАЙСКАЯ ШЛЯПА
+Player:AddDivider()
+Player:AddLabel("Chinese Hat")
+
+local HatToggle = Player:AddToggle({
+    Name = "Enable Hat",
+    Callback = function(Value)
+        Hat_ToggleEnabled(Value)
+    end
+})
+
+Player:AddDropdown({
+    Name = "Hat Style",
+    Values = {"Classic", "Drawing"},
+    Default = "Classic",
+    Callback = function(Value)
+        Hat_ChangeStyle(Value)
+    end
+})
+
+Player:AddToggle({
+    Name = "Rainbow Hat",
+    Callback = function(Value)
+        HatVariables.rainbow = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Rainbow Speed",
+    Default = 5,
+    Min = 1,
+    Max = 20,
+    Round = 0,
+    Callback = function(Value)
+        HatVariables.rainbowSpeed = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Hat Transparency",
+    Default = 0.3,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function(Value)
+        HatVariables.transparency = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Hat Radius",
+    Default = 2.4,
+    Min = 0.5,
+    Max = 10,
+    Round = 1,
+    Callback = function(Value)
+        HatVariables.radius = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Hat Height",
+    Default = 1.6,
+    Min = 0.5,
+    Max = 5,
+    Round = 1,
+    Callback = function(Value)
+        HatVariables.height = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Hat Reflectance",
+    Default = 0,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function(Value)
+        HatVariables.reflectance = Value
+    end
+})
+
+Player:AddSlider({
+    Name = "Hat Sides",
+    Default = 25,
+    Min = 3,
+    Max = 300,
+    Round = 0,
+    Callback = function(Value)
+        Hat_UpdateSides(Value)
+    end
+})
+
+Player:AddColorPicker({
+    Name = "Hat Color",
+    Default = Color3.fromRGB(0, 255, 255),
+    Callback = function(Value)
+        HatVariables.color = Value
+    end
+})
+
+-- TRAIL
+Player:AddDivider()
+Player:AddLabel("Trail")
+
+local TrailToggle = Player:AddToggle({
+    Name = "Enable Trail",
+    Callback = function(Value)
+        Trail_ToggleEnabled(Value)
+    end
+})
+
+Player:AddToggle({
+    Name = "Gradient Trail",
+    Callback = function(Value)
+        TrailVariables.isGradient = Value
+        if TrailVariables.enabled and player.Character then 
+            Trail_AddToCharacter(player.Character) 
+        end
+    end
+})
+
+Player:AddSlider({
+    Name = "Trail Lifetime",
+    Default = 0.5,
+    Min = 0.1,
+    Max = 3,
+    Round = 1,
+    Callback = function(Value)
+        TrailVariables.lifetime = Value
+        Trail_UpdateAll()
+    end
+})
+
+Player:AddSlider({
+    Name = "Trail Transparency",
+    Default = 0,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function(Value)
+        TrailVariables.transparencyStart = Value
+        Trail_UpdateAll()
+    end
+})
+
+Player:AddToggle({
+    Name = "Rainbow Trail",
+    Callback = function(Value)
+        TrailVariables.rainbow = Value
+        Trail_UpdateAll()
+    end
+})
+
+Player:AddColorPicker({
+    Name = "Trail Color",
+    Default = Color3.fromRGB(0, 255, 255),
+    Callback = function(Value)
+        TrailVariables.colorStatic = Value
+        Trail_UpdateAll()
+    end
+})
+
+Player:AddColorPicker({
+    Name = "Gradient Color 1",
+    Default = Color3.fromRGB(0, 86, 255),
+    Callback = function(Value)
+        TrailVariables.gradient1 = Value
+        Trail_UpdateAll()
+    end
+})
+
+Player:AddColorPicker({
+    Name = "Gradient Color 2",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(Value)
+        TrailVariables.gradient2 = Value
+        Trail_UpdateAll()
+    end
+})
+
+-- FORCEFIELD
+Player:AddDivider()
+Player:AddLabel("ForceField")
+
+local FFToggle = Player:AddToggle({
+    Name = "Enable ForceField",
+    Callback = function(Value)
+        ForceField_ToggleEnabled(Value)
+    end
+})
+
+Player:AddToggle({
+    Name = "Rainbow ForceField",
+    Callback = function(Value)
+        ForceFieldVariables.rainbow = Value
+        ForceField_Update()
+    end
+})
+
+Player:AddColorPicker({
+    Name = "ForceField Color",
+    Default = Color3.fromRGB(128, 128, 128),
+    Callback = function(Value)
+        ForceFieldVariables.color = Value
+        if ForceFieldVariables.enabled and not ForceFieldVariables.rainbow and player.Character then 
+            ForceField_Apply(player.Character) 
+        end
+    end
+})
+
+-- AURA TRAILER
+Player:AddDivider()
+Player:AddLabel("Aura Trailer")
+
+local AuraTrailerToggle = Player:AddToggle({
+    Name = "Enable Aura Trailer",
+    Callback = function(Value)
+        AuraTrailerVariables.enabled = Value
+        AuraTrailer_Toggle(Value)
+    end
+})
+
+Player:AddColorPicker({
+    Name = "Aura Trailer Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(Value)
+        AuraTrailerVariables.color = Value
+        if AuraTrailerVariables.enabled then AuraTrailer_Update() end
+    end
+})
+
+Player:AddSlider({
+    Name = "Aura Trailer Lifetime",
+    Default = 0.5,
+    Min = 0.1,
+    Max = 3,
+    Round = 1,
+    Callback = function(Value)
+        AuraTrailerVariables.lifetime = Value
+        if AuraTrailerVariables.enabled then AuraTrailer_Update() end
+    end
+})
+
+-- PLAYER MOVEMENT
+Player:AddDivider()
+Player:AddLabel("Movement")
+
+Player:AddToggle({
+    Name = "Walk on Water",
+    Callback = function(Value)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, not Value)
+        end
+    end
+})
+
+Player:AddToggle({
+    Name = "No Clip",
+    Callback = function(Value)
+        local char = player.Character
+        if char then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not Value
+                end
+            end
+        end
+    end
+})
+
+Player:AddSlider({
+    Name = "Walk Speed",
+    Default = 16,
+    Min = 0,
+    Max = 100,
+    Round = 1,
+    Callback = function(Value)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+Player:AddSlider({
+    Name = "Jump Power",
+    Default = 50,
+    Min = 0,
+    Max = 200,
+    Round = 1,
+    Callback = function(Value)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.JumpPower = Value
+        end
+    end
+})
+
+Player:AddToggle({
+    Name = "No Fall Damage",
+    Callback = function(Value)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.UseJumpPower = not Value
+        end
+    end
+})
+
+-- THIRD PERSON
+Player:AddDivider()
+Player:AddLabel("Camera")
+
+local ThirdPerson = Player:AddToggle({
+    Name = "Third Person",
+    Option = true,
+    Callback = function(Value)
+        if Value then
+            camera.CameraSubject = player.Character
+            camera.CameraType = Enum.CameraType.Fixed
+        else
+            camera.CameraSubject = player.Character
+            camera.CameraType = Enum.CameraType.Custom
+        end
+    end
+})
+
+ThirdPerson.Option:AddSlider({
+    Name = "Third Person Distance",
+    Default = 10,
+    Min = 1,
+    Max = 50,
+    Round = 1,
+    Callback = function(Value)
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
+            local direction = (camera.CFrame.Position - hrp.Position).Unit
+            camera.CFrame = CFrame.new(hrp.Position + direction * Value, hrp.Position)
+        end
+    end
+})
+
+Player:AddSlider({
+    Name = "FOV",
+    Default = 70,
+    Min = 1,
+    Max = 120,
+    Round = 1,
+    Callback = function(Value)
+        camera.FieldOfView = Value
+    end
+})
+
+-- ===================== ПОДКАТЕГОРИЯ AURA =====================
+local Aura = Visuals:AddSection({
+    Name = "Aura",
+    Position = 'right'
+})
+
+-- CLASSIC AURA
+Aura:AddDivider()
+Aura:AddLabel("Classic Aura")
+
+local ClassicAuraEnabled = Aura:AddToggle({
+    Name = "Enable Classic Aura",
+    Callback = function(Value)
+        ClassicAura_RefreshAll()
+    end
+})
+
+local ClassicAuraDropdown = Aura:AddDropdown({
+    Name = "Select Auras",
+    Values = AuraModels,
+    Multi = true,
+    Default = {},
+    Callback = function(Value)
+        ClassicAura_RefreshAll()
+    end
+})
+
+-- PARTICLE AURA
+Aura:AddDivider()
+Aura:AddLabel("Particle Aura")
+
+local ParticleAuraEnabled = Aura:AddToggle({
+    Name = "Enable Particle Aura",
+    Callback = function(Value)
+        ParticleAura_RefreshAll()
+    end
+})
+
+local ParticleAuraColor = Aura:AddColorPicker({
+    Name = "Particle Aura Color",
+    Default = Color3.fromRGB(133, 220, 255),
+    Callback = function()
+        ParticleAura_RefreshAll()
+    end
+})
+
+local ParticleAuraDropdown = Aura:AddDropdown({
+    Name = "Select Particle Auras",
+    Values = PARTICLE_AURA_NAMES,
+    Multi = true,
+    Default = {},
+    Callback = function(Value)
+        ParticleAura_RefreshAll()
+    end
+})
+
+-- BASIC AURA
+Aura:AddDivider()
+Aura:AddLabel("Basic Aura")
+
+local BasicAura = Aura:AddToggle({
+    Name = "Enable Basic Aura",
+    Option = true,
+    Callback = function(Value)
+        local char = player.Character
+        if not char then return end
+        
+        if Value then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            
+            local aura = Instance.new("Part")
+            aura.Name = "CandyBasicAura"
+            aura.Size = Vector3.new(6, 6, 6)
+            aura.Shape = Enum.PartType.Ball
+            aura.Material = Enum.Material.Neon
+            aura.CanCollide = false
+            aura.Transparency = 0.5
+            aura.Parent = hrp
+            
+            local weld = Instance.new("WeldConstraint")
+            weld.Part0 = hrp
+            weld.Part1 = aura
+            weld.Parent = aura
+        else
+            local aura = char:FindFirstChild("CandyBasicAura")
+            if aura then aura:Destroy() end
+        end
+    end
+})
+
+BasicAura.Option:AddColorPicker({
+    Name = "Aura Color",
+    Default = Color3.fromRGB(0, 255, 255),
+    Callback = function(Value)
+        local char = player.Character
+        if char then
+            local aura = char:FindFirstChild("CandyBasicAura")
+            if aura then aura.Color = Value end
+        end
+    end
+})
+
+BasicAura.Option:AddSlider({
+    Name = "Aura Size",
+    Default = 6,
+    Min = 1,
+    Max = 20,
+    Round = 1,
+    Callback = function(Value)
+        local char = player.Character
+        if char then
+            local aura = char:FindFirstChild("CandyBasicAura")
+            if aura then
+                aura.Size = Vector3.new(Value, Value, Value)
+            end
+        end
+    end
+})
+
+BasicAura.Option:AddSlider({
+    Name = "Aura Transparency",
+    Default = 0.5,
+    Min = 0,
+    Max = 1,
+    Round = 2,
+    Callback = function(Value)
+        local char = player.Character
+        if char then
+            local aura = char:FindFirstChild("CandyBasicAura")
+            if aura then aura.Transparency = Value end
+        end
+    end
+})
+
+Aura:AddToggle({
+    Name = "Rainbow Aura",
+    Callback = function(Value)
+        if Value then
+            if auraRainbowConnection then auraRainbowConnection:Disconnect() end
+            auraRainbowConnection = RunService.Heartbeat:Connect(function()
+                local char = player.Character
+                if char then
+                    local aura = char:FindFirstChild("CandyBasicAura")
+                    if aura then
+                        aura.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                    end
+                end
+            end)
+        else
+            if auraRainbowConnection then 
+                auraRainbowConnection:Disconnect()
+                auraRainbowConnection = nil
+            end
+        end
+    end
+})
+
+Aura:AddToggle({
+    Name = "Pulse Aura",
+    Callback = function(Value)
+        if Value then
+            if auraPulseConnection then auraPulseConnection:Disconnect() end
+            auraPulseConnection = RunService.Heartbeat:Connect(function()
+                local char = player.Character
+                if char then
+                    local aura = char:FindFirstChild("CandyBasicAura")
+                    if aura then
+                        local size = 6 + math.sin(tick() * 3) * 1.5
+                        aura.Size = Vector3.new(size, size, size)
+                    end
+                end
+            end)
+        else
+            if auraPulseConnection then 
+                auraPulseConnection:Disconnect()
+                auraPulseConnection = nil
+            end
+        end
+    end
+})
+
+Aura:AddToggle({
+    Name = "Aura Trails",
+    Callback = function(Value)
+        local char = player.Character
+        if not char then return end
+        
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        if Value then
+            local trail = Instance.new("Trail")
+            trail.Name = "CandyAuraTrail"
+            trail.Lifetime = 0.5
+            trail.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0),
+                NumberSequenceKeypoint.new(1, 1)
+            })
+            trail.Color = ColorSequence.new(Color3.fromRGB(0, 255, 255))
+            trail.Parent = hrp
+        else
+            local trail = hrp:FindFirstChild("CandyAuraTrail")
+            if trail then trail:Destroy() end
+        end
+    end
+})
+
+Aura:AddToggle({
+    Name = "Particles",
+    Callback = function(Value)
+        local char = player.Character
+        if not char then return end
+        
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        if Value then
+            local emitter = Instance.new("ParticleEmitter")
+            emitter.Name = "CandyParticles"
+            emitter.Texture = "rbxassetid://373640392"
+            emitter.Rate = 50
+            emitter.Lifetime = NumberRange.new(1)
+            emitter.SpreadAngle = Vector2.new(360, 360)
+            emitter.VelocityInheritance = 0
+            emitter.Speed = NumberRange.new(3, 6)
+            emitter.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0),
+                NumberSequenceKeypoint.new(1, 1)
+            })
+            emitter.Size = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0.5),
+                NumberSequenceKeypoint.new(1, 0)
+            })
+            emitter.Color = ColorSequence.new(Color3.fromRGB(0, 255, 255))
+            emitter.Parent = hrp
+        else
+            local emitter = hrp:FindFirstChild("CandyParticles")
+            if emitter then emitter:Destroy() end
+        end
+    end
+})
+
+-- ANIME
+Aura:AddDivider()
+Aura:AddLabel("Utilities")
+
+Aura:AddToggle({
+    Name = "Anime Image",
+    Callback = function(Value)
+        Anime_Toggle(Value)
+    end
+})
+
+Aura:AddButton({
+    Name = "FPS/Ping Counter 1",
+    Callback = function()
+        if not FPSVariables.fpsPing1Enabled then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/GLAMOHGA/fling/refs/heads/main/хз%20как%20назвать%20типо%20фпс%20и%20пинг.md"))()
+            FPSVariables.fpsPing1Enabled = true
+        end
+    end
+})
+
+Aura:AddButton({
+    Name = "FPS/Ping Counter 2",
+    Callback = function()
+        if not FPSVariables.fpsPing2Enabled then
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/VetrexTheBest/Fps-ping/refs/heads/main/fps%2Bping.txt"))()
+            FPSVariables.fpsPing2Enabled = true
+        end
+    end
+})
 
 -- ===================== HEARTBEAT =====================
 RunService.Heartbeat:Connect(function()
@@ -1577,3 +2150,10 @@ end
 
 player.CharacterAdded:Connect(ReapplyVisuals_OnCharacterSpawned)
 if player.Character then ReapplyVisuals_OnCharacterSpawned(player.Character) end
+
+-- ===================== УВЕДОМЛЕНИЕ О ЗАГРУЗКЕ =====================
+Notification:Notify({
+    Title = "Candy Visuals",
+    Content = "Loaded successfully! Enjoy!",
+    Icon = "check"
+})
