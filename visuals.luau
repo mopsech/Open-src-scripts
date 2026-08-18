@@ -10,7 +10,7 @@ Library.ShowToggleFrameInKeybinds = true
 
 local Window = Library:CreateWindow({
 	Title = "CandyZone",
-	Footer = "https://discord.gg/3KjWyZ6uBu",
+	Footer = "Mopsech",
 	Icon = 95816097006870,
 	NotifySide = "Right",
 	ShowCustomCursor = true,
@@ -1270,9 +1270,9 @@ local UISettingsTab = Window:AddTab("Settings", "settings")
 
 -- ===================== MAIN TAB =====================
 local MainGroup = MainTab:AddLeftGroupbox("Information")
-MainGroup:AddLabel("by https://discord.gg/3KjWyZ6uBu")
-MainGroup:AddLabel("All the functions are visual; no one can see them except you.")
-MainGroup:AddLabel("Script Open Source")
+MainGroup:AddLabel("by mopsech(ds)")
+MainGroup:AddLabel("All the functions are visual.")
+MainGroup:AddLabel("Best Visuals script.")
 -- ===================== VISUAL TAB =====================
 
 -- КИТАЙСКАЯ ШЛЯПА (ОБЪЕДИНЕННАЯ)
