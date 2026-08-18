@@ -1,3 +1,29 @@
+-- слито в https://discord.gg/3KjWyZ6uBu
+-- Cracked by @idkmops(tg) @mopsech(ds)
+--
+-- ════════════════════════════════════════════════════════════════
+--
+--
+--   /$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$  /$$     /$$       /$$$$$$$$  /$$$$$$  /$$   /$$ /$$$$$$$$
+--  /$$__  $$ /$$__  $$| $$$ | $$| $$__  $$|  $$   /$$/      |_____ $$  /$$__  $$| $$$ | $$| $$_____/
+-- | $$  \__/| $$  \ $$| $$$$| $$| $$  \ $$ \  $$ /$$/            /$$/ | $$  \ $$| $$$$| $$| $$      
+-- | $$      | $$$$$$$$| $$ $$ $$| $$  | $$  \  $$$$/            /$$/  | $$  | $$| $$ $$ $$| $$$$$     
+-- | $$      | $$__  $$| $$  $$$$| $$  | $$   \  $$/            /$$/   | $$  | $$| $$  $$$$| $$__/   
+-- | $$    $$| $$  | $$| $$\  $$$| $$  | $$    | $$            /$$/    | $$  | $$| $$\  $$$| $$      
+-- |  $$$$$$/| $$  | $$| $$ \  $$| $$$$$$$/    | $$           /$$$$$$$$|  $$$$$$/| $$ \  $$| $$$$$$$$
+--  \______/ |__/  |__/|__/  \__/|_______/     |__/          |________/ \______/ |__/  \__/|________/                                                                                                                                                                                                
+--                                                                                                  
+--
+-- ════════════════════════════════════════════════════════════════
+-- 🔥 CRACKED BY MOPS 🔥
+-- 💬 Discord: @mopsech
+-- ✈️ Telegram: @idkmops
+-- 
+-- 📢 СКРИПТ СЛИТ В ПУБЛИЧНЫЙ ДОСТУП!
+-- 🔗 ССЫЛКА НА КАНАЛ: https://discord.gg/3KjWyZ6uBu
+-- 
+-- ⭐ СПАСИБО ЗА ИСПОЛЬЗОВАНИЕ!
+
 local t1 = {}
 local v2 = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 local t2 = {
@@ -12,7 +38,7 @@ local t3 = {
 	RememberJoins = true
 }
 local v6 = CreateWindow(v2, {
-	Name = "SyrexGenesisX - Flick",
+	Name = "SyrexGenesisX - Crack",
 	LoadingTitle = "BITCH ASS CREDIT ME IF U MAKE A VID",
 	LoadingSubtitle = "Tag JoshKingGames for credit pls",
 	ConfigurationSaving = t2,
@@ -442,7 +468,7 @@ if t1.value11 then
     t1.value24()
 end
 v2:Notify({
-	Title = "SGX IS READY TO BE USED",
+	Title = "Cracked by @mopsech (discord)",
 	Content = "Script loaded successfully!",
 	Duration = 6.5,
 	Image = 4483362458
