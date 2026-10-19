@@ -1,6 +1,5 @@
 -- candy.cc UI for Roblox Executor
--- timebomb duels
-
+-- ОПЕН СУРС ИИ ХУЙНЯ Я И ТАК ЗНАЮ МОЖЕТЕ НЕ ПИСАТЬ МНЕ СЫНКИ ББЛЯДЕЙ
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -120,9 +119,17 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+-- ============ ЛОГОТИП (ЗАКРУГЛЁННЫЙ) ============
 local Logo = Instance.new("ImageLabel")
 Logo.Size = UDim2.new(0, 32, 0, 32); Logo.Position = UDim2.new(0, 16, 0, 14)
-Logo.BackgroundTransparency = 1; Logo.Image = logoAsset; Logo.ScaleType = Enum.ScaleType.Fit; Logo.Parent = Header
+Logo.BackgroundTransparency = 1
+Logo.Image = logoAsset
+Logo.ScaleType = Enum.ScaleType.Crop
+Logo.ClipsDescendants = true  -- чтобы UICorner реально обрезал картинку
+Logo.Parent = Header
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(1, 0)  -- полный круг
+LogoCorner.Parent = Logo
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0, 220, 0, 20); Title.Position = UDim2.new(0, 56, 0, 12)
@@ -136,6 +143,7 @@ Subtitle.BackgroundTransparency = 1; Subtitle.Text = "timebomb duels"; Subtitle.
 Subtitle.TextSize = 11; Subtitle.Font = Enum.Font.GothamBold; Subtitle.TextXAlignment = Enum.TextXAlignment.Left; Subtitle.Parent = Header
 regTheme(Subtitle, "TextColor3", "SubText")
 
+-- ============ КНОПКА КОПИРОВАНИЯ ============
 local copyBtn = Instance.new("TextButton")
 copyBtn.Size = UDim2.new(0, 28, 0, 28)
 copyBtn.Position = UDim2.new(1, -74, 0.5, -14)
@@ -161,6 +169,7 @@ copyBtn.MouseButton1Click:Connect(function()
     Notify("candy.cc", "copied: t.me/candyware", 2.5, "copy")
 end)
 
+-- ============ КНОПКА ЗАКРЫТИЯ (КРЕСТИК ИЗ ДВУХ ЛИНИЙ) ============
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 28, 0, 28)
 closeBtn.Position = UDim2.new(1, -38, 0.5, -14)
@@ -171,22 +180,37 @@ closeBtn.ZIndex = 5
 closeBtn.Parent = Header
 regTheme(closeBtn, "BackgroundColor3", "Panel")
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
-local closeIcon = Instance.new("TextLabel")
-closeIcon.Size = UDim2.new(1, 0, 1, 0)
-closeIcon.BackgroundTransparency = 1
-closeIcon.Text = "✕"
-closeIcon.TextColor3 = Theme.Text
-closeIcon.TextSize = 16
-closeIcon.Font = Enum.Font.GothamBold
-closeIcon.Parent = closeBtn
-regTheme(closeIcon, "TextColor3", "Text")
+
+-- Две полоски, повёрнутые на ±45° — дают крестик без зависимости от шрифта
+local xLine1 = Instance.new("Frame")
+xLine1.Size = UDim2.new(0, 14, 0, 2)
+xLine1.Position = UDim2.new(0.5, -7, 0.5, -1)
+xLine1.AnchorPoint = Vector2.new(0, 0)
+xLine1.BackgroundColor3 = Theme.Text
+xLine1.BorderSizePixel = 0
+xLine1.Rotation = 45
+xLine1.Parent = closeBtn
+regTheme(xLine1, "BackgroundColor3", "Text")
+
+local xLine2 = Instance.new("Frame")
+xLine2.Size = UDim2.new(0, 14, 0, 2)
+xLine2.Position = UDim2.new(0.5, -7, 0.5, -1)
+xLine2.AnchorPoint = Vector2.new(0, 0)
+xLine2.BackgroundColor3 = Theme.Text
+xLine2.BorderSizePixel = 0
+xLine2.Rotation = -45
+xLine2.Parent = closeBtn
+regTheme(xLine2, "BackgroundColor3", "Text")
+
 closeBtn.MouseEnter:Connect(function()
     TweenService:Create(closeBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
-    closeIcon.TextColor3 = Color3.new(1, 1, 1)
+    xLine1.BackgroundColor3 = Color3.new(1, 1, 1)
+    xLine2.BackgroundColor3 = Color3.new(1, 1, 1)
 end)
 closeBtn.MouseLeave:Connect(function()
     TweenService:Create(closeBtn, TweenInfo.new(0.1), {BackgroundColor3 = Theme.Panel}):Play()
-    closeIcon.TextColor3 = Theme.Text
+    xLine1.BackgroundColor3 = Theme.Text
+    xLine2.BackgroundColor3 = Theme.Text
 end)
 
 local reopenBtn = Instance.new("TextButton")
@@ -1106,14 +1130,13 @@ local LegitScroll = MakeCombatHalf(0, "legit")
 local RageScroll = MakeCombatHalf(0.5, "rage")
 
 -- ============================================================
--- LEGIT: WALLHOP (логика из V2.6 Mode 1) + FLICK
+-- LEGIT: WALLHOP + FLICK
 -- ============================================================
 local wallhopEnabled = false
 local flickEnabled = false
 local flickInterval = 0.3
 local lastFlick = 0
 
--- Настройки wallhop
 local WH = {
     Cooldown = 0.15,
     JumpVelocity = 56,
@@ -1125,14 +1148,12 @@ local WH = {
 local whLastJump = 0
 local whLastWallTime = 0
 
--- Кэш параметров raycast
 local raycastParams = RaycastParams.new()
 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 local function updateRaycastFilter()
     raycastParams.FilterDescendantsInstances = {LP.Character or {}}
 end
 
--- Логика hasWall из V2.6 (с буфером и player detection)
 local function hasWall(root)
     if not root then return false end
     updateRaycastFilter()
@@ -1167,14 +1188,10 @@ local function hasWall(root)
             end
         end
     end
-    -- wall buffer
-    if tick() - whLastWallTime < WH.WallBuffer then
-        return true
-    end
+    if tick() - whLastWallTime < WH.WallBuffer then return true end
     return false
 end
 
--- Слушаем JumpRequest (срабатывает по нажатию пробела) — Infinite Jump
 UserInputService.JumpRequest:Connect(function()
     if not wallhopEnabled then return end
     local char = LP.Character
@@ -1190,7 +1207,6 @@ UserInputService.JumpRequest:Connect(function()
     root.AssemblyLinearVelocity = Vector3.new(vel.X, WH.JumpVelocity + jitter, vel.Z)
 end)
 
--- FLICK
 RunService.Heartbeat:Connect(function()
     if flickEnabled then
         local now = tick()
@@ -1219,36 +1235,66 @@ CreateToggle(legitCard, "flick", false, function(s) flickEnabled = s end, true)
 CreateSlider(legitCard, "flick interval", 0.1, 1, 0.3, "s", function(v) flickInterval = v end)
 
 -- ============================================================
--- RAGE
+-- RAGE (Speed/Jump boost — рабочий)
 -- ============================================================
 local speedBoostEnabled = false
 local speedValue = 50
 local jumpBoostEnabled = false
 local jumpValue = 100
 
+-- Слушатели, чтобы "прилипало" и при сбросе игры
+local speedConn = nil
+local jumpConn = nil
+
 local function applySpeed()
     local char = LP.Character
     local hum = char and char:FindFirstChild("Humanoid")
-    if hum then hum.WalkSpeed = speedBoostEnabled and speedValue or 16 end
+    if not hum then return end
+    hum.WalkSpeed = speedBoostEnabled and speedValue or 16
+    -- Ставим слушатель, чтобы WalkSpeed не сбрасывался
+    if speedConn then speedConn:Disconnect() end
+    speedConn = hum:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if speedBoostEnabled and hum.WalkSpeed ~= speedValue then
+            hum.WalkSpeed = speedValue
+        end
+    end)
 end
+
 local function applyJump()
     local char = LP.Character
     local hum = char and char:FindFirstChild("Humanoid")
-    if hum then
-        if jumpBoostEnabled then
-            hum.UseJumpPower = true; hum.JumpPower = jumpValue
-        else
-            hum.JumpPower = 50
-        end
+    if not hum then return end
+    if jumpBoostEnabled then
+        hum.UseJumpPower = true
+        hum.JumpPower = jumpValue
+    else
+        hum.JumpPower = 50
     end
+    if jumpConn then jumpConn:Disconnect() end
+    jumpConn = hum:GetPropertyChangedSignal("JumpPower"):Connect(function()
+        if jumpBoostEnabled and hum.JumpPower ~= jumpValue then
+            hum.JumpPower = jumpValue
+        end
+    end)
 end
-LP.CharacterAdded:Connect(function() task.wait(0.3); applySpeed(); applyJump() end)
+
+LP.CharacterAdded:Connect(function()
+    task.wait(0.3)
+    applySpeed()
+    applyJump()
+end)
 
 local rageCard = CreateCard(RageScroll, "rage")
 CreateToggle(rageCard, "speed boost", false, function(s) speedBoostEnabled = s; applySpeed() end, true)
-CreateSlider(rageCard, "speed value", 16, 200, 50, "", function(v) speedValue = v; if speedBoostEnabled then applySpeed() end end)
+CreateSlider(rageCard, "speed value", 16, 200, 50, "", function(v)
+    speedValue = v
+    if speedBoostEnabled then applySpeed() end
+end)
 CreateToggle(rageCard, "jump boost", false, function(s) jumpBoostEnabled = s; applyJump() end, true)
-CreateSlider(rageCard, "jump value", 50, 500, 100, "", function(v) jumpValue = v; if jumpBoostEnabled then applyJump() end end)
+CreateSlider(rageCard, "jump value", 50, 500, 100, "", function(v)
+    jumpValue = v
+    if jumpBoostEnabled then applyJump() end
+end)
 
 -- ============================================================
 -- SETTINGS
@@ -1338,4 +1384,4 @@ Players.PlayerAdded:Connect(CreatePlayerESP)
 Players.PlayerRemoving:Connect(RemovePlayerESP)
 for _, p in ipairs(Players:GetPlayers()) do CreatePlayerESP(p) end
 
-Notify("candy.cc", "loaded successfully", 3, "success")
+Notify("EZ NIGGA")
